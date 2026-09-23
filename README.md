@@ -100,17 +100,18 @@ Watch the complete working demonstration on YouTube:
 ## 📂 Project Structure
 
 ```text
-nabha-telemedicine-platform/
-├── Smart India Hackathon 2025/
-│   ├── Rural Healthcare Website Design (2)/   # Main platform + Video calling
-│   ├── Digital health records/                # Health records service
-│   ├── API/                                    # Medicine availability API
-│   └── unified-backend/                        # API gateway
-├── chat-sih/                                   # Community chat & forum
-├── Skin-Disease-Prediction-main/               # AI skin disease detection
-├── Village Health Hub/
-├── Pregnancy and Period Tracker/
-└── Blood Donation App Features/
+niramaya-digital-healthcare/
+├── frontend/
+│   └── main-web/                               # Main Niramaya frontend
+├── backend/
+│   ├── health-records/                         # Health records service
+│   └── medicine-api/                           # Medicine and pharmacy API
+├── video-consultation/
+│   └── zegocloud-app/                          # Separate video application
+├── archive/                                    # Retained standalone and backup projects
+├── docs/
+├── scripts/
+└── Smart India Hackathon 2025/unified-backend/ # Legacy proxy, retained for review
 ```
 
 ---
@@ -130,27 +131,18 @@ nabha-telemedicine-platform/
 git clone https://github.com/shaauryaa/nabha-telemedicine-platform.git
 cd nabha-telemedicine-platform
 
-# Install all JS dependencies
-cd chat-sih && npm install && cd client && npm install && cd ../..
-cd "Smart India Hackathon 2025/Digital health records" && npm install && cd ../..
-cd "Smart India Hackathon 2025/Rural Healthcare Website Design (2)" && npm install && cd ../..
-cd "Smart India Hackathon 2025/Rural Healthcare Website Design (2)/ZEGOCLOUD-VideoCalling-App-main" && npm install && cd ../../../..
-cd "Village Health Hub" && npm install && cd ..
-cd "Pregnancy and Period Tracker" && npm install && cd ..
-cd "Blood Donation App Features" && npm install && cd ..
-cd "Skin-Disease-Prediction-main/Skin Disease Prediction Form" && npm install && cd ../..
+# Install active JavaScript dependencies
+cd frontend/main-web && npm install && cd ../..
+cd backend/health-records && npm install && cd ../..
+cd video-consultation/zegocloud-app && npm install && cd ../..
 
 # Set up Python environments
-python -m venv "Smart India Hackathon 2025/API/venv"
-"Smart India Hackathon 2025/API/venv/Scripts/pip" install -r "Smart India Hackathon 2025/API/requirements.txt"
+python -m venv backend/medicine-api/venv
+backend/medicine-api/venv/Scripts/pip install -r backend/medicine-api/requirements.txt
 pip install bcrypt PyJWT  # additional deps
 
 python -m venv "Smart India Hackathon 2025/unified-backend/venv"
 "Smart India Hackathon 2025/unified-backend/venv/Scripts/pip" install -r "Smart India Hackathon 2025/unified-backend/requirements.txt"
-
-python -m venv "Skin-Disease-Prediction-main/venv_new"
-"Skin-Disease-Prediction-main/venv_new/Scripts/pip" install -r "Skin-Disease-Prediction-main/requirements.txt"
-pip install flask-cors  # additional dep
 ```
 
 ### Environment Variables
@@ -158,19 +150,10 @@ pip install flask-cors  # additional dep
 Copy the example files and fill in your credentials:
 
 ```bash
-cp chat-sih/env.example chat-sih/.env
-cp "Smart India Hackathon 2025/Digital health records/.env.example" "Smart India Hackathon 2025/Digital health records/.env"
+cp backend/health-records/env.example backend/health-records/.env
 ```
 
-**`chat-sih/.env`**
-```env
-PORT=5050
-DB_TYPE=sqlite
-DB_PATH=./database/community.db
-JWT_SECRET=your-secret-key
-```
-
-**`Digital health records/.env`** — requires Firebase project credentials (see `.env.example`).
+**`backend/health-records/.env`** — requires Firebase project credentials (see `env.example`).
 
 ---
 
@@ -180,33 +163,23 @@ Start each service in a separate terminal:
 
 ```bash
 # 1. Main Website
-cd "Smart India Hackathon 2025/Rural Healthcare Website Design (2)"
+cd frontend/main-web
 npx vite --port 3000 --host
 
-# 2. Chat Backend
-cd chat-sih && node server.js
+# 2. Health Records API
+cd backend/health-records && node server.js
 
-# 3. Health Records API
-cd "Smart India Hackathon 2025/Digital health records" && node server.js
-
-# 4. Medicine API
-cd "Smart India Hackathon 2025/API"
+# 3. Medicine API
+cd backend/medicine-api
 ./venv/Scripts/python app.py
 
-# 5. Unified Backend
+# 4. Unified Backend (optional legacy proxy)
 cd "Smart India Hackathon 2025/unified-backend"
 ./venv/Scripts/python app.py
 
-# 6. Skin Disease API (loads TensorFlow model ~30s)
-cd "Skin-Disease-Prediction-main"
-./venv_new/Scripts/python app.py
-
-# 7-11. Micro-frontends
-cd "Skin-Disease-Prediction-main/Skin Disease Prediction Form" && npx vite --port 3001
-cd "Smart India Hackathon 2025/Rural Healthcare Website Design (2)/ZEGOCLOUD-VideoCalling-App-main" && npx vite --port 5175
-cd "Village Health Hub" && npx vite --port 5176
-cd "Pregnancy and Period Tracker" && npx vite --port 5177
-cd "Blood Donation App Features" && npx vite --port 5178
+# 5. Video Consultation
+cd video-consultation/zegocloud-app
+npx vite --port 5175
 ```
 
 Then open **`http://localhost:3000`**

@@ -1,0 +1,10 @@
+{
+  "common": {
+    "language": "भाषा",
+    "languages": {
+      "en": "English",
+      "hi": "हिंदी",
+      "pa": "ਪੰਜਾਬੀ"
+    }
+  }
+}
