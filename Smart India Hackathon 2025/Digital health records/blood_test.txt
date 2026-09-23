@@ -1,0 +1,21 @@
+BLOOD TEST REPORT
+=================
+
+Patient: Ishank Pandey
+Date: September 10, 2025
+Lab: Nabha Medical Laboratory
+
+Test Results:
+- Hemoglobin: 14.2 g/dL (Normal: 12-16)
+- White Blood Cells: 7,200/μL (Normal: 4,000-11,000)
+- Red Blood Cells: 4.8 million/μL (Normal: 4.5-5.5)
+- Platelets: 280,000/μL (Normal: 150,000-450,000)
+- Blood Sugar (Fasting): 85 mg/dL (Normal: 70-100)
+- Cholesterol: 180 mg/dL (Normal: <200)
+
+Summary:
+All blood test results are within normal range.
+Patient is in good health.
+
+Lab Technician: Dr. Sharma
+Reviewed by: Dr. Kumar

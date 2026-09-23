@@ -1,0 +1,34 @@
+{
+"tagline": "Connecting Rural Healthcare",
+  "healthcare_message": "Healthcare is a",
+  "healthcare_message2" :"right",
+  "healthcare_message3": "not a" ,
+  "healthcare_message4":"privilege",
+  "join_message": "Join thousands of healthcare providers and patients in revolutionizing rural healthcare delivery across Punjab.",
+  
+  "multilingual_title": "Multilingual App",
+  "multilingual_desc": "Available in Punjabi, Hindi, and English",
+  "secure_private": "Secure & Private",
+  "encrypted_consultations": "End-to-end encrypted consultations",
+  "transforming": "Transforming Rural Healthcare",
+  "connecting": "Connecting communities through technology",
+
+  "welcome_back": "Welcome Back",
+  "signin_message": "Sign in to access your healthcare dashboard",
+  "email": "Email Address",
+  "password": "Password",
+  "password_placeholder": "Enter your password",
+  "signin_button": "Sign In to Dashboard",
+
+  "no_account": "Don't have an account?",
+  "signup": "Sign up here",
+  "forgot_password": "Forgot password?",
+  "remember_me": "Remember me",
+  "sign_in": "Sign In",
+  "or_continue_as": "Or continue as",
+  "doctor": "Doctor",
+  "patient": "Patient",
+  "pharmacist": "Pharmacist",
+  "register_here": "Register here"
+
+}

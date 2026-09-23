@@ -1,0 +1,33 @@
+{
+  "tagline": "ਪਿੰਡਾਂ ਦੀ ਸਿਹਤ ਸੇਵਾ ਨੂੰ ਜੋੜਨਾ",
+  "healthcare_message": "ਸਿਹਤ ਸੇਵਾ",
+  "healthcare_message2": "ਅਧਿਕਾਰ",
+  "healthcare_message3": "ਨਾ ਕਿ",
+  "healthcare_message4": "ਵਿਸ਼ੇਸ਼ ਅਧਿਕਾਰ",
+
+  "join_message": "ਪੰਜਾਬ ਵਿੱਚ ਪਿੰਡਾਂ ਦੀ ਸਿਹਤ ਸੇਵਾ ਵਿੱਚ ਕ੍ਰਾਂਤੀ ਲਿਆਉਣ ਲਈ ਹਜ਼ਾਰਾਂ ਸਿਹਤ ਪ੍ਰਦਾਤਾਵਾਂ ਅਤੇ ਮਰੀਜ਼ਾਂ ਨਾਲ ਜੁੜੋ।",
+  
+  "multilingual_title": "ਬਹੁਭਾਸ਼ੀ ਐਪ",
+  "multilingual_desc": "ਪੰਜਾਬੀ, ਹਿੰਦੀ ਅਤੇ ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ ਉਪਲਬਧ",
+  "secure_private": "ਸੁਰੱਖਿਅਤ ਅਤੇ ਨਿੱਜੀ",
+  "encrypted_consultations": "ਐਂਡ-ਟੂ-ਐਂਡ ਇਨਕ੍ਰਿਪਟ ਕੀਤੀਆਂ ਸਲਾਹ-ਮਸ਼ਵਰੇ",
+  "transforming": "ਪਿੰਡਾਂ ਦੀ ਸਿਹਤ ਸੇਵਾ ਵਿੱਚ ਬਦਲਾਅ",
+  "connecting": "ਟੈਕਨੋਲੋਜੀ ਰਾਹੀਂ ਕਮਿਊਨਿਟੀਆਂ ਨੂੰ ਜੋੜਨਾ",
+
+  "welcome_back": "ਵਾਪਸੀ ਤੇ ਸੁਆਗਤ ਹੈ",
+  "signin_message": "ਆਪਣੇ ਸਿਹਤ ਡੈਸ਼ਬੋਰਡ ਤੱਕ ਪਹੁੰਚ ਕਰਨ ਲਈ ਸਾਇਨ ਇਨ ਕਰੋ",
+  "email": "ਈਮੇਲ ਐਡਰੈੱਸ",
+  "password": "ਪਾਸਵਰਡ",
+  "password_placeholder": "ਆਪਣਾ ਪਾਸਵਰਡ ਦਰਜ ਕਰੋ",
+  "signin_button": "ਡੈਸ਼ਬੋਰਡ ਵਿੱਚ ਸਾਇਨ ਇਨ ਕਰੋ",
+  "no_account": "ਕੀ ਤੁਹਾਡੇ ਕੋਲ ਖਾਤਾ ਨਹੀਂ ਹੈ?",
+  "signup": "ਇੱਥੇ ਸਾਇਨ ਅੱਪ ਕਰੋ",
+  "forgot_password": "ਪਾਸਵਰਡ ਭੁੱਲ ਗਏ?",
+  "remember_me": "ਮੈਨੂੰ ਯਾਦ ਰੱਖੋ",
+  "sign_in": "ਲੌਗਇਨ ਕਰੋ",
+  "or_continue_as": "ਜਾਂ ਇਸ ਤਰ੍ਹਾਂ ਜਾਰੀ ਰੱਖੋ",
+  "doctor": "ਡਾਕਟਰ",
+  "patient": "ਮਰੀਜ਼",
+  "pharmacist": "ਫਾਰਮਾਸਿਸਟ",
+  "register_here": "ਇਥੇ ਸਾਈਨ ਅੱਪ ਕਰੋ"
+}

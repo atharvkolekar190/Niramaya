@@ -1,0 +1,25 @@
+PATIENT HEALTH RECORD
+====================
+
+Patient Name: Ishank Pandey
+Date: September 14, 2025
+Record Type: General Health Checkup
+
+Vital Signs:
+- Blood Pressure: 120/80 mmHg
+- Heart Rate: 72 bpm
+- Temperature: 98.6°F
+- Weight: 70 kg
+- Height: 175 cm
+
+Symptoms:
+- No current symptoms
+- General wellness checkup
+
+Recommendations:
+- Continue regular exercise
+- Maintain healthy diet
+- Annual checkup recommended
+
+Doctor: Dr. Singh
+Hospital: Nabha Civil Hospital

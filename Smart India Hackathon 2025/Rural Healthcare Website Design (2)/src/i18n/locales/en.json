@@ -1,0 +1,76 @@
+{
+  "symptomChecker": {
+    "title": "AI-Powered Symptom Checker",
+    "backToHomepage": "Back to Homepage",
+    "hero": {
+      "title": "Smart Health Assessment",
+      "subtitle": "Powered by AI",
+      "description": "Get instant preliminary health assessments based on your symptoms. Our AI helps you understand when to seek medical care and provides initial guidance in multiple languages."
+    },
+    "symptomInput": {
+      "title": "Tell us about your symptoms",
+      "placeholder": "Add a symptom (e.g., fever, cough, fatigue)",
+      "selectedSymptoms": "Selected symptoms",
+      "none": "None",
+      "analyzeButton": "Analyze Symptoms",
+      "analyzing": "Analyzing...",
+      "addSymptomError": "Please add at least one symptom.",
+      "analysisError": "Failed to analyze symptoms. Please check your internet connection and try again."
+    },
+    "results": {
+      "title": "AI Assessment Results",
+      "probableConditions": "Probable Conditions",
+      "noConditions": "No conditions suggested. Try adding more specific symptoms.",
+      "likelihood": {
+        "high": "high likelihood",
+        "medium": "medium likelihood",
+        "low": "low likelihood"
+      },
+      "nextSteps": {
+        "title": "Next Steps",
+        "selfCare": "Self-care",
+        "whenToSeeDoctor": "When to see a doctor",
+        "redFlags": "Red flags"
+      }
+    },
+    "actions": {
+      "checkDifferentSymptoms": "Check Different Symptoms"
+    },
+    "features": {
+      "aiPowered": {
+        "title": "AI-Powered",
+        "description": "Advanced machine learning algorithms"
+      },
+      "multilingual": {
+        "title": "Multilingual",
+        "description": "Available in Punjabi, Hindi & English"
+      },
+      "personalized": {
+        "title": "Personalized",
+        "description": "Tailored to your medical history"
+      },
+      "emergencyDetection": {
+        "title": "Emergency Detection",
+        "description": "Identifies urgent medical situations"
+      }
+    },
+    "disclaimer": {
+      "title": "Important Medical Disclaimer",
+      "text": "This AI symptom checker is for informational purposes only and does not constitute medical advice. It cannot replace professional medical consultation. Always consult with qualified healthcare providers for proper diagnosis and treatment. In case of emergency, contact local emergency services immediately."
+    },
+    "stats": {
+      "symptomsAnalyzed": "Symptom Checks Completed",
+      "accuracyRate": "User Satisfaction",
+      "medicalConditions": "Conditions Covered",
+      "availableSupport": "Always Available"
+    }
+  },
+  "common": {
+    "language": "Language",
+    "languages": {
+      "en": "English",
+      "hi": "हिंदी",
+      "pa": "ਪੰਜਾਬੀ"
+    }
+  }
+}
