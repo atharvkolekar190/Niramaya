@@ -17,7 +17,7 @@ const SolutionSection = lazy(() => import('./components/SolutionSection'));
 const MapSection = lazy(() => import('./components/MapSection'));
 const DataSection = lazy(() => import('./components/DataSection'));
 const Insights = lazy(() => import('./components/Insights'));
-const HealthResources = lazy(() => import('./components/HealthResources'));
+const WellnessLibrary = lazy(() => import('./components/WellnessLibrary'));
 const StakeholdersSection = lazy(() => import('./components/StakeholdersSection'));
 const LearnMore = lazy(() => import('./components/LearnMore'));
 const CTASection = lazy(() => import('./components/CTASection'));
@@ -284,7 +284,7 @@ export default function App() {
   if (currentView === 'health-resources') {
     return (
       <Suspense fallback={<LoadingSection />}>
-        <HealthResources onBack={handleBackToWebsite} />
+        <WellnessLibrary onBack={handleBackToWebsite} />
       </Suspense>
     );
   }

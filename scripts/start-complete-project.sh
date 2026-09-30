@@ -60,7 +60,7 @@ echo "   ✅ Health Records API started (PID: $HEALTH_RECORDS_PID)"
 # Start Unified Backend (Port 8000)
 echo ""
 echo "5️⃣ Starting Unified Backend (Port 8000)..."
-cd "$ROOT_DIR/Smart India Hackathon 2025/unified-backend"
+cd "$ROOT_DIR/unified-services/unified-backend"
 python app.py &
 UNIFIED_PID=$!
 echo "   ✅ Unified Backend started (PID: $UNIFIED_PID)"

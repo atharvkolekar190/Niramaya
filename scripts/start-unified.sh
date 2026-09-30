@@ -45,7 +45,7 @@ echo ""
 echo "🚀 Starting Backend Services..."
 
 # Check if we're in the right directory
-if [ ! -d "$ROOT_DIR/backend/medicine-api" ] && [ ! -d "$ROOT_DIR/Smart India Hackathon 2025/unified-backend" ]; then
+if [ ! -d "$ROOT_DIR/backend/medicine-api" ] && [ ! -d "$ROOT_DIR/unified-services/unified-backend" ]; then
     echo "❌ Repository services were not found"
     exit 1
 fi
@@ -95,8 +95,8 @@ check_port 3002 && echo "   ✅ Health Records API (3002): Ready"
 # Start Unified Backend (Port 8000)
 echo ""
 echo "5️⃣ Starting Unified Backend (Port 8000)..."
-if [ -d "$ROOT_DIR/Smart India Hackathon 2025/unified-backend" ]; then
-    cd "$ROOT_DIR/Smart India Hackathon 2025/unified-backend"
+if [ -d "$ROOT_DIR/unified-services/unified-backend" ]; then
+    cd "$ROOT_DIR/unified-services/unified-backend"
     if [ ! -f "venv/bin/activate" ]; then
         echo "   📦 Creating virtual environment..."
         python3 -m venv venv

@@ -22,7 +22,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 
-interface HealthResourcesProps { onBack: () => void; }
+interface WellnessLibraryProps { onBack: () => void; }
 type Category = 'General Health' | 'Preventive Care' | 'Nutrition' | 'Physical Activity' | 'Sleep & Wellness' | 'Hygiene' | 'Health Awareness' | 'Traditional / Home Remedies';
 interface HealthResource {
   id: string;
@@ -247,7 +247,7 @@ function ResourceDetail({ resource, onBack }: { resource: HealthResource; onBack
   return <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6"><Button variant="outline" onClick={onBack} className="mb-8 flex items-center gap-2"><ArrowLeft className="h-4 w-4" aria-hidden="true" />Back to Wellness Library</Button><article><div className="mb-5 flex items-center gap-3 text-green-700"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100"><Icon className="h-5 w-5" aria-hidden="true" /></span><span className="text-sm font-medium">{resource.category}</span></div><h1 className="mb-4 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">{resource.title}</h1><p className="mb-8 text-lg leading-relaxed text-gray-600">{resource.introduction}</p><div className="space-y-8"><section><h2 className="mb-3 text-2xl font-semibold text-gray-900">Key information</h2><ul className="space-y-3 text-gray-600">{resource.keyInformation.map((item) => <li key={item} className="flex items-start gap-3 leading-relaxed"><CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-green-600" aria-hidden="true" />{item}</li>)}</ul></section><section><h2 className="mb-3 text-2xl font-semibold text-gray-900">Practical, general tips</h2><ul className="space-y-3 text-gray-600">{resource.practicalTips.map((item) => <li key={item} className="flex items-start gap-3 leading-relaxed"><CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-blue-600" aria-hidden="true" />{item}</li>)}</ul></section>{resource.whenToConsult && <section className="rounded-xl border border-amber-200 bg-amber-50 p-5"><h2 className="mb-2 text-xl font-semibold text-amber-950">When to consult a doctor</h2><p className="leading-relaxed text-amber-900">{resource.whenToConsult}</p></section>}{resource.source && <p className="border-t border-gray-200 pt-5 text-sm leading-relaxed text-gray-500"><strong>Source / reference:</strong> {resource.source}</p>}</div></article></main>;
 }
 
-export default function HealthResources({ onBack }: HealthResourcesProps) {
+export default function WellnessLibrary({ onBack }: WellnessLibraryProps) {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<Category | 'All'>('All');
   const [selectedResource, setSelectedResource] = useState<HealthResource | null>(null);

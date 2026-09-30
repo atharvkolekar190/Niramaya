@@ -2,7 +2,7 @@
 
 # 🏥 Nabha Telemedicine Platform
 
-### Smart India Hackathon 2025 — Top 100 Teams at Bennett University
+### Niramaya Digital Healthcare
 
 A full-stack, microservices-based **rural healthcare platform** built for SIH 2025 — bridging the healthcare gap in underserved rural communities through accessible digital health tools, AI-powered diagnostics, telemedicine, and secure health records.
 
@@ -111,7 +111,7 @@ niramaya-digital-healthcare/
 ├── archive/                                    # Retained standalone and backup projects
 ├── docs/
 ├── scripts/
-└── Smart India Hackathon 2025/unified-backend/ # Legacy proxy, retained for review
+└── unified-services/unified-backend/ # Legacy proxy, retained for review
 ```
 
 ---
@@ -141,8 +141,8 @@ python -m venv backend/medicine-api/venv
 backend/medicine-api/venv/Scripts/pip install -r backend/medicine-api/requirements.txt
 pip install bcrypt PyJWT  # additional deps
 
-python -m venv "Smart India Hackathon 2025/unified-backend/venv"
-"Smart India Hackathon 2025/unified-backend/venv/Scripts/pip" install -r "Smart India Hackathon 2025/unified-backend/requirements.txt"
+python -m venv "unified-services/unified-backend/venv"
+"unified-services/unified-backend/venv/Scripts/pip" install -r "unified-services/unified-backend/requirements.txt"
 ```
 
 ### Environment Variables
@@ -174,7 +174,7 @@ cd backend/medicine-api
 ./venv/Scripts/python app.py
 
 # 4. Unified Backend (optional legacy proxy)
-cd "Smart India Hackathon 2025/unified-backend"
+cd "unified-services/unified-backend"
 ./venv/Scripts/python app.py
 
 # 5. Video Consultation
@@ -215,7 +215,7 @@ Built to address real healthcare challenges in rural India:
 
 ## 👨‍💻 Team
 
-**Team Console** — Smart India Hackathon 2025
+**Team Console** — Niramaya Digital Healthcare
 
 ---
 
