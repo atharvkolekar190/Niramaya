@@ -16,8 +16,8 @@ export default function Footer() {
   ];
 
   const partners = [
-    { name: "Punjab Health Dept", href: "#punjab" },
-    { name: "Nabha Civil Hospital", href: "#hospital" },
+    { name: "Healthcare Partners", href: "#partners" },
+    { name: "Care Teams", href: "#hospital" },
     { name: "Rural Pharmacies", href: "#pharmacy" },
     { name: "Community Health Workers", href: "#workers" }
   ];
@@ -34,20 +34,19 @@ export default function Footer() {
                 <Heart className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h3 className="text-xl">Nabha Telemedicine</h3>
-                <p className="text-green-400 text-sm">Rural Healthcare Initiative</p>
+                <h3 className="text-xl">Niramaya</h3>
+                <p className="text-green-400 text-sm">Unified Digital Healthcare</p>
               </div>
             </div>
             
             <p className="text-gray-300 mb-6 leading-relaxed text-sm">
-              Transforming rural healthcare access through innovative telemedicine solutions. 
-              Connecting 173 villages to quality medical care.
+              Niramaya connects patients, doctors, pharmacists, digital health records, consultations, prescriptions, and health education in one ecosystem.
             </p>
 
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm">
                 <MapPin className="h-4 w-4 text-green-400" />
-                <span className="text-gray-300">Nabha, Punjab, India</span>
+                <span className="text-gray-300">Digital healthcare platform</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Phone className="h-4 w-4 text-green-400" />
@@ -55,7 +54,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Mail className="h-4 w-4 text-green-400" />
-                <span className="text-gray-300">info@nabhatelemedicine.org</span>
+                <span className="text-gray-300">info@niramaya.health</span>
               </div>
             </div>
           </div>
@@ -157,7 +156,7 @@ export default function Footer() {
           <h4 className="text-lg mb-4">Data Sources & References</h4>
           <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-400">
             <ul className="space-y-2">
-              <li>• Punjab Health Department, 2024</li>
+              <li>• Public healthcare references</li>
               <li>• National Rural Health Mission Data</li>
               <li>• Census 2011 - Rural Demographics</li>
             </ul>
@@ -172,7 +171,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-sm text-gray-400 mb-4 md:mb-0">
-            © 2024 Nabha Telemedicine Initiative. Built with ❤️ for rural healthcare transformation.
+            © 2024 Niramaya Digital Healthcare. Built for accessible, connected care.
           </div>
           
           <div className="flex gap-6 text-sm text-gray-400">
@@ -185,9 +184,8 @@ export default function Footer() {
         {/* Disclaimer */}
         <div className="mt-8 p-4 bg-gray-800 rounded-lg">
           <p className="text-xs text-gray-400 text-center leading-relaxed">
-            <strong>Disclaimer:</strong> This is a conceptual presentation of the Nabha Telemedicine Initiative. 
-            All data presented is based on publicly available sources and research. This project is designed 
-            to demonstrate potential impact and solutions for rural healthcare challenges in Punjab.
+            <strong>Disclaimer:</strong> Niramaya resources are educational and do not replace professional medical advice. 
+            Facility information and health guidance should be verified with the relevant healthcare provider.
           </p>
         </div>
       </div>

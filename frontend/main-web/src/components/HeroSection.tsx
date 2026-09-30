@@ -1,6 +1,7 @@
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Button } from './ui/button';
 import { ArrowRight, Play } from 'lucide-react';
+import heroBackground from '../assets/niramaya-hero-background.jpg';
 
 type Props = { onLearnMore?: () => void; onViewSolution?: () => void };
 
@@ -10,7 +11,7 @@ export default function HeroSection({ onLearnMore, onViewSolution }: Props) {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <ImageWithFallback
-          src="https://images.unsplash.com/photo-1698465281093-9f09159733b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxydXJhbCUyMGhlYWx0aGNhcmUlMjBkb2N0b3IlMjBwYXRpZW50JTIwSW5kaWF8ZW58MXx8fHwxNzU3NDQxNzg4fDA&ixlib=rb-4.1.0&q=80&w=1080"
+          src={heroBackground}
           alt="Rural healthcare in India"
           className="w-full h-full object-cover"
         />
@@ -20,12 +21,11 @@ export default function HeroSection({ onLearnMore, onViewSolution }: Props) {
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 text-center text-white">
         <h1 className="text-5xl md:text-7xl mb-6 leading-tight">
-          Revolutionizing Rural Healthcare in{' '}
-          <span className="text-green-400">Nabha</span>
+          Niramaya Digital Healthcare
         </h1>
         
         <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
-          173 villages. Thousands of lives. One scalable solution.
+          A unified platform for patients, doctors, pharmacists, records, consultations, and health insights.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

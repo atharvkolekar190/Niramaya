@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 const languages = [
   { code: 'en', name: 'English', nativeName: 'English' },
   { code: 'hi', name: 'हिंदी', nativeName: 'हिंदी' },
-  { code: 'pa', name: 'ਪੰਜਾਬੀ', nativeName: 'ਪੰਜਾਬੀ' },
+  { code: 'mr', name: 'Marathi', nativeName: 'मराठी' },
 ];
 
 export default function LanguageSelector() {

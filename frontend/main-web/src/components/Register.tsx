@@ -70,8 +70,8 @@ export default function RegistrationPage({  onRegistrationSuccess,onShowLogin,on
               <Heart className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl text-gray-900">Nabha Telemedicine</h1>
-              <p className="text-sm text-gray-600">Connecting Rural Healthcare</p>
+              <h1 className="text-2xl text-gray-900">Niramaya Digital Healthcare</h1>
+              <p className="text-sm text-gray-600">Connected care for everyday health needs</p>
             </div>
           </div>
           
@@ -83,7 +83,7 @@ export default function RegistrationPage({  onRegistrationSuccess,onShowLogin,on
           
           <p className="text-lg text-gray-600 leading-relaxed">
             Join thousands of healthcare providers and patients in revolutionizing 
-            rural healthcare delivery across Punjab.
+            Niramaya connects patients and healthcare professionals through records, consultations, prescriptions, and practical health information.
           </p>
 
           {/* Feature Highlights */}
@@ -94,7 +94,7 @@ export default function RegistrationPage({  onRegistrationSuccess,onShowLogin,on
               </div>
               <div>
                 <h4 className="text-gray-900 text-sm">Multilingual App</h4>
-                <p className="text-xs text-gray-600">Available in Punjabi, Hindi, and English</p>
+                <p className="text-xs text-gray-600">Available in Marathi, Hindi, and English</p>
               </div>
             </div>
             
@@ -124,9 +124,9 @@ export default function RegistrationPage({  onRegistrationSuccess,onShowLogin,on
         {/* Right Side - Registractionn Form */}
         <Card className="w-full max-w-md mx-auto shadow-xl border-0 bg-white/90">
           <CardHeader className="space-y-1 pb-6">
-            <CardTitle className="text-2xl text-center text-gray-900">Welcome to Nabha Telemedicine</CardTitle>
+            <CardTitle className="text-2xl text-center text-gray-900">Welcome to Niramaya</CardTitle>
             <p className="text-center text-gray-600 text-sm">
-             Join Nabha Telemedicine today
+             Join Niramaya Digital Healthcare today
             </p>
           </CardHeader>
           
@@ -158,7 +158,7 @@ export default function RegistrationPage({  onRegistrationSuccess,onShowLogin,on
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  placeholder="doctor@nabha.health"
+                  placeholder="doctor@niramaya.health"
                   className="h-10 border-gray-200 focus:border-green-500 focus:ring-green-500/20"
                 />
               </div>

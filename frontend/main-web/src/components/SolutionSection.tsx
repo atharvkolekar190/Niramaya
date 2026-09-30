@@ -9,7 +9,7 @@ function SolutionSection() {
     {
       icon: Video,
       title: "Multilingual Telemedicine App",
-      description: "TeleHealth-powered video consultations supporting Punjabi, Hindi, and English with role-based access",
+      description: "TeleHealth-powered video consultations supporting Marathi, Hindi, and English with role-based access",
       features: ["HD Video Calls", "Multi-language Support", "Role-based Dashboards", "Emergency SOS"],
       color: "green",
       gradient: "from-green-500 to-emerald-600"
@@ -106,7 +106,7 @@ function SolutionSection() {
               </div>
               <h4 className="text-lg mb-3 text-gray-900">AI-Powered Analysis</h4>
               <p className="text-gray-600 text-sm leading-relaxed">
-                Gemini AI integration for intelligent symptom analysis with multilingual support in Punjabi, Hindi, and English
+                Gemini AI integration for educational health insights with multilingual support in Marathi, Hindi, and English
               </p>
             </div>
             

@@ -536,7 +536,7 @@ export const facilities = [
 ];
 
 interface InteractiveMapProps {
-  language: 'en' | 'hi' | 'pa';
+  language: 'en' | 'hi' | 'mr';
   filters: {
     specialty: string;
     type: string;
@@ -563,8 +563,7 @@ export function InteractiveMap({
 
   // Filter facilities based on search and filters
   const filteredFacilities = useMemo(() => facilities.filter(facility => {
-    const nameToSearch = language === 'hi' ? facility.nameHindi : 
-                        language === 'pa' ? facility.namePunjabi : facility.name;
+    const nameToSearch = language === 'hi' ? facility.nameHindi : facility.name;
     
     const matchesSearch = searchQuery === '' || 
       nameToSearch.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -606,7 +605,6 @@ export function InteractiveMap({
   const getFacilityName = (facility: any) => {
     switch (language) {
       case 'hi': return facility.nameHindi;
-      case 'pa': return facility.namePunjabi;
       default: return facility.name;
     }
   };

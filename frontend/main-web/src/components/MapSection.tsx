@@ -7,7 +7,7 @@ import { FilterPanel } from './FilterPanel';
 import { HealthcareStats } from './HealthcareStats';
 
 function MapSection() {
-  const [language, setLanguage] = useState<'en' | 'hi' | 'pa'>('en');
+  const [language, setLanguage] = useState<'en' | 'hi' | 'mr'>('en');
   const [searchQuery, setSearchQuery] = useState('');
   const [, setSelectedFacility] = useState<any>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -50,8 +50,7 @@ function MapSection() {
             Healthcare Network <span className="text-green-600">Map</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Interactive visualization of Nabha's healthcare infrastructure and 
-            the 173 villages that will benefit from our telemedicine solution.
+            Explore healthcare facilities and connected services through the Niramaya network.
           </p>
         </div>
 
@@ -135,7 +134,7 @@ function MapSection() {
                         const matchesAvailability = filters.availability === 'all' || f.availability === filters.availability;
                         const matchesGov = filters.isGovernment === undefined || f.isGovernment === filters.isGovernment;
                         const matchesSpec = filters.specialty === 'all' || f.specialties.includes(filters.specialty);
-                        const nameToSearch = language === 'hi' ? f.nameHindi : language === 'pa' ? f.namePunjabi : f.name;
+                        const nameToSearch = language === 'hi' ? f.nameHindi : f.name;
                         const matchesSearch = !searchQuery || nameToSearch.toLowerCase().includes(searchQuery.toLowerCase()) || f.specialties.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
                         return matchesType && matchesAvailability && matchesGov && matchesSpec && matchesSearch;
                       })
@@ -144,7 +143,7 @@ function MapSection() {
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="text-lg">{f.type === 'pharmacy' ? '💊' : f.type === 'emergency' ? '🚑' : '🏥'}</span>
-                              <h4 className="font-medium">{language === 'hi' ? f.nameHindi : language === 'pa' ? f.namePunjabi : f.name}</h4>
+                              <h4 className="font-medium">{language === 'hi' ? f.nameHindi : f.name}</h4>
                             </div>
                             <p className="text-sm text-gray-600 mt-1">{f.distance} • {f.travelTime} • {f.hours}</p>
                             <p className="text-sm text-gray-600">{f.specialties.join(', ')}</p>

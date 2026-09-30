@@ -1,4 +1,4 @@
-import { Video, FileText, Pill, Building2, Stethoscope } from 'lucide-react';
+import { Video, FileText, Pill, Building2, Stethoscope, BookOpen } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 
 interface FeaturesSectionProps {
@@ -9,9 +9,19 @@ interface FeaturesSectionProps {
 // All available features
 const allFeatures = [
   {
+    id: 'health-resources',
+    title: 'Wellness Library',
+    description: 'Learn about prevention, nutrition, hygiene, sleep, movement, and everyday wellbeing',
+    icon: BookOpen,
+    color: 'from-emerald-500 to-green-600',
+    bgColor: 'bg-emerald-50',
+    borderColor: 'border-emerald-200',
+    hoverColor: 'hover:bg-emerald-100'
+  },
+  {
     id: 'telemedicine',
     title: 'Multilingual Telemedicine App',
-    description: 'Connect with healthcare providers through video consultations in Punjabi, Hindi, and English',
+    description: 'Connect with healthcare providers through video consultations in Marathi, Hindi, and English',
     icon: Video,
     color: 'from-green-500 to-emerald-600',
     bgColor: 'bg-green-50',
@@ -52,7 +62,7 @@ const allFeatures = [
 
 // Additional bullet points merged from the former "Our Solution" section
 const featureBullets: Record<string, string[]> = {
-  'telemedicine': ['HD Video Calls', 'Multi-language Support', 'Role-based Dashboards', 'Emergency SOS'],
+  'telemedicine': ['HD Video Calls', 'Multi-language Support', 'Role-based Dashboards', 'Secure Consultations'],
   'records': ['Patient Records', 'Medical History', 'Secure Storage', 'Data Management'],
   'medicine': ['Real-time Stock', '173 Village Coverage', 'Pharmacy Network', 'Verified Data']
 };
@@ -62,7 +72,7 @@ const patientFeatures = [
   {
     id: 'telemedicine',
     title: 'Multilingual Telemedicine App',
-    description: 'Connect with healthcare providers through video consultations in Punjabi, Hindi, and English',
+    description: 'Connect with healthcare providers through video consultations in Marathi, Hindi, and English',
     icon: Video,
     color: 'from-green-500 to-emerald-600',
     bgColor: 'bg-green-50',
@@ -88,7 +98,17 @@ const patientFeatures = [
     bgColor: 'bg-orange-50',
     borderColor: 'border-orange-200',
     hoverColor: 'hover:bg-orange-100'
-  }
+  },
+    {
+      id: 'health-resources',
+      title: 'Wellness Library',
+      description: 'Explore practical information about prevention, nutrition, wellness, and everyday health',
+      icon: BookOpen,
+      color: 'from-emerald-500 to-green-600',
+      bgColor: 'bg-emerald-50',
+      borderColor: 'border-emerald-200',
+      hoverColor: 'hover:bg-emerald-100'
+    }
 ];
 
 const doctorFeatures = [
@@ -105,7 +125,7 @@ const doctorFeatures = [
   {
     id: 'telemedicine',
     title: 'Multilingual Telemedicine App',
-    description: 'Conduct video consultations with patients in Punjabi, Hindi, and English',
+    description: 'Conduct video consultations with patients in Marathi, Hindi, and English',
     icon: Video,
     color: 'from-green-500 to-emerald-600',
     bgColor: 'bg-green-50',
@@ -128,7 +148,7 @@ const pharmacistFeatures = [
   {
     id: 'pharmacy',
     title: 'Pharmacy Dashboard',
-    description: 'Real-time inventory management for pharmacies to update medicine stock and availability',
+    description: 'Prescription-based medicine fulfillment and patient order coordination',
     icon: Building2,
     color: 'from-teal-500 to-cyan-600',
     bgColor: 'bg-teal-50',
@@ -193,7 +213,7 @@ export default function FeaturesSection({ onFeatureClick, userRole }: FeaturesSe
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             {userRole ?
               `Explore ${userRole}-specific tools designed for your healthcare needs` :
-              'Explore our complete suite of telemedicine tools designed specifically for rural healthcare challenges in Punjab'
+              'Explore Niramaya tools for connected, accessible digital healthcare'
             }
           </p>
         </div>
@@ -262,11 +282,10 @@ export default function FeaturesSection({ onFeatureClick, userRole }: FeaturesSe
         <div className="text-center mt-16">
           <div className="bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl p-8 text-white">
             <h3 className="text-2xl mb-4">
-              Ready to Transform Rural Healthcare?
+              Healthcare information, connected care, and trusted support
             </h3>
             <p className="text-green-100 mb-6 max-w-2xl mx-auto">
-              Join our mission to bring quality healthcare to every village in Punjab.
-              These tools are designed to bridge the gap between rural patients and healthcare providers.
+              Niramaya brings patients, doctors, pharmacists, records, consultations, prescriptions, and health education together in one ecosystem.
             </p>
             <div className="flex justify-center">
               <button

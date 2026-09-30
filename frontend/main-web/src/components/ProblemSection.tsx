@@ -8,11 +8,11 @@ export default function ProblemSection() {
           {/* Left Content */}
           <div>
             <h2 className="text-4xl md:text-5xl mb-6 text-gray-900">
-              The Healthcare Crisis in Rural <span className="text-green-600">Punjab</span>
+              The healthcare access challenge
             </h2>
             
             <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-              Nabha's rural communities face unprecedented healthcare challenges. With a severe shortage of medical professionals, 
+              Patients and care teams can face distance, fragmented records, language barriers, and limited access to timely information.
               inadequate infrastructure, and geographical barriers, thousands of residents struggle to access basic medical care.
             </p>
 

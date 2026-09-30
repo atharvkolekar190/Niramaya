@@ -21,7 +21,7 @@ const FeaturePanel = () => {
     {
       icon: Globe,
       title: "Multilingual Support",
-      description: "Available in Punjabi, Hindi & English"
+      description: "Available in Marathi, Hindi & English"
     },
     {
       icon: Shield,
@@ -30,7 +30,7 @@ const FeaturePanel = () => {
     },
     {
       icon: Brain,
-      title: "AI-Powered Diagnostics",
+      title: "AI-Assisted Health Insights",
       description: "Smart health insights and recommendations"
     },
     {
@@ -108,7 +108,7 @@ const FeaturePanel = () => {
               <span className="text-white text-2xl">♥</span>
             </div>
             <h1 className="text-4xl mb-2">
-              Nabha<span className="text-green-600">.health</span>
+              Niramaya<span className="text-green-600">.health</span>
             </h1>
             <p className="text-gray-600">
               Healthcare is a <span className="text-green-600 font-medium">right</span>, not privilege.
@@ -427,7 +427,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                 <Input
                   id="email"
                   type="email"
-                  placeholder={selectedRole === "doctor" ? "doctor@nabha.health" : selectedRole === "pharmacist" ? "pharmacist@nabha.health" : `${selectedRole}@nabha.health`}
+                  placeholder={selectedRole === "doctor" ? "doctor@niramaya.health" : selectedRole === "pharmacist" ? "pharmacist@niramaya.health" : `${selectedRole}@niramaya.health`}
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   className="h-12 mt-2"

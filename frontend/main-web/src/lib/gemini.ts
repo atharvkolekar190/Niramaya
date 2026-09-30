@@ -88,13 +88,13 @@ Remember: Always encourage users to consult healthcare professionals for serious
 - For medical conditions, use both Hindi terms and English terms in parentheses where appropriate
 - Example: "बुखार (Fever)" or "सिरदर्द (Headache)"`;
       
-      case 'pa':
+      case 'mr':
         return `LANGUAGE INSTRUCTIONS:
-- Respond entirely in Punjabi (ਪੰਜਾਬੀ)  
-- Use Gurmukhi script
-- Use medical terms that are commonly understood in Punjabi
-- For medical conditions, use both Punjabi terms and English terms in parentheses where appropriate
-- Example: "ਬੁਖ਼ਾਰ (Fever)" or "ਸਿਰਦਰਦ (Headache)"`;
+- Respond entirely in Marathi (मराठी)
+- Use Devanagari script
+- Use medical terms that are commonly understood in Marathi
+- For medical conditions, use both Marathi terms and English terms in parentheses where appropriate
+- Example: "ताप (Fever)" or "डोकेदुखी (Headache)"`;
       
       default:
         return `LANGUAGE INSTRUCTIONS:
@@ -147,7 +147,7 @@ Please provide a helpful response:`;
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyBR1Lo49yCahy7QmanJsI4cl_-9KjsZbsY';
       if (!apiKey) {
-        return "AI service not available for symptom analysis.";
+        return "AI health insights are not available right now.";
       }
 
       const prompt = `${this.getHealthPrompt()}

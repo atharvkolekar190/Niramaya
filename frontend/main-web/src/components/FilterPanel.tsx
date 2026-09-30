@@ -6,7 +6,7 @@ import { Badge } from './ui/badge';
 import { Search } from 'lucide-react';
 
 interface FilterPanelProps {
-  language: 'en' | 'hi' | 'pa';
+  language: 'en' | 'hi' | 'mr';
   searchQuery: string;
   onSearchChange: (query: string) => void;
   filters: {
@@ -16,7 +16,7 @@ interface FilterPanelProps {
     isGovernment?: boolean;
   };
   onFilterChange: (filters: any) => void;
-  onLanguageChange: (lang: 'en' | 'hi' | 'pa') => void;
+  onLanguageChange: (lang: 'en' | 'hi' | 'mr') => void;
 }
 
 const translations = {
@@ -45,7 +45,7 @@ const translations = {
     private: "Private",
     english: "English",
     hindi: "हिंदी",
-    punjabi: "ਪੰਜਾਬੀ",
+    marathi: "मराठी",
     clearFilters: "Clear Filters",
     nearMe: "Near Me"
   },
@@ -74,38 +74,38 @@ const translations = {
     private: "निजी",
     english: "English",
     hindi: "हिंदी", 
-    punjabi: "ਪੰਜਾਬੀ",
+    marathi: "मराठी",
     clearFilters: "फिल्टर साफ़ करें",
     nearMe: "मेरे पास"
   },
-  pa: {
-    search: "ਹਸਪਤਾਲ, ਡਾਕਟਰ ਜਾਂ ਮਾਹਰਤਾ ਖੋਜੋ...",
-    filters: "ਫਿਲਟਰ",
-    specialty: "ਮਾਹਰਤਾ",
-    type: "ਕਿਸਮ",
-    availability: "ਉਪਲਬਧਤਾ",
-    sector: "ਸੈਕਟਰ", 
-    language: "ਭਾਸ਼ਾ",
-    all: "ਸਾਰੇ",
-    general: "ਆਮ",
-    emergency: "ਐਮਰਜੈਂਸੀ",
-    cardiology: "ਦਿਲ ਦੀਆਂ ਬਿਮਾਰੀਆਂ",
-    orthopedics: "ਹੱਡੀਆਂ ਦੀਆਂ ਬਿਮਾਰੀਆਂ",
-    gynecology: "ਔਰਤਾਂ ਦੀਆਂ ਬਿਮਾਰੀਆਂ",
-    pediatrics: "ਬੱਚਿਆਂ ਦੀਆਂ ਬਿਮਾਰੀਆਂ",
-    hospital: "ਹਸਪਤਾਲ",
-    clinic: "ਕਲੀਨਿਕ",
-    pharmacy: "ਦਵਾਖ਼ਾਨਾ",
-    available: "ਉਪਲਬਧ",
-    limited: "ਸੀਮਿਤ",
-    unavailable: "ਅਣਉਪਲਬਧ",
-    government: "ਸਰਕਾਰੀ",
-    private: "ਨਿਜੀ",
+  mr: {
+    search: "रुग्णालय, डॉक्टर किंवा विशेषज्ञ शोधा...",
+    filters: "फिल्टर",
+    specialty: "विशेषज्ञता",
+    type: "प्रकार",
+    availability: "उपलब्धता",
+    sector: "क्षेत्र",
+    language: "भाषा",
+    all: "सर्व",
+    general: "सामान्य",
+    emergency: "आपत्कालीन",
+    cardiology: "हृदयरोग",
+    orthopedics: "अस्थिरोग",
+    gynecology: "स्त्रीरोग",
+    pediatrics: "बालरोग",
+    hospital: "रुग्णालय",
+    clinic: "क्लिनिक",
+    pharmacy: "औषधालय",
+    available: "उपलब्ध",
+    limited: "मर्यादित",
+    unavailable: "अनुपलब्ध",
+    government: "सरकारी",
+    private: "खासगी",
     english: "English",
     hindi: "हिंदी",
-    punjabi: "ਪੰਜਾਬੀ",
-    clearFilters: "ਫਿਲਟਰ ਸਾਫ਼ ਕਰੋ",
-    nearMe: "ਮੇਰੇ ਕੋਲ"
+    marathi: "मराठी",
+    clearFilters: "फिल्टर साफ करा",
+    nearMe: "माझ्याजवळ"
   }
 };
 
@@ -155,7 +155,7 @@ export function FilterPanel({
             <SelectContent className="z-50 min-w-[8rem] shadow-lg border border-gray-200 rounded-md bg-white">
               <SelectItem value="en">EN</SelectItem>
               <SelectItem value="hi">हिं</SelectItem>
-              <SelectItem value="pa">ਪੰ</SelectItem>
+              <SelectItem value="mr">मर</SelectItem>
             </SelectContent>
           </Select>
           {hasActiveFilters && (

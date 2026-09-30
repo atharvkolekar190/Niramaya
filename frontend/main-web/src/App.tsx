@@ -2,7 +2,6 @@ import { lazy, Suspense, useState, useEffect } from 'react';
 import { User, LogOut, ChevronDown } from 'lucide-react';
 import HeroSection from './components/HeroSection';
 import ProblemSection from './components/ProblemSection';
-import ImpactSection from './components/ImpactSection';
 import FeaturesSection from './components/FeaturesSection';
 import FloatingChatbot from './components/FloatingChatbot';
 import { authService, type User as AuthUser } from './services/authService';
@@ -18,13 +17,14 @@ const SolutionSection = lazy(() => import('./components/SolutionSection'));
 const MapSection = lazy(() => import('./components/MapSection'));
 const DataSection = lazy(() => import('./components/DataSection'));
 const Insights = lazy(() => import('./components/Insights'));
+const HealthResources = lazy(() => import('./components/HealthResources'));
 const StakeholdersSection = lazy(() => import('./components/StakeholdersSection'));
 const LearnMore = lazy(() => import('./components/LearnMore'));
 const CTASection = lazy(() => import('./components/CTASection'));
 const Footer = lazy(() => import('./components/Footer'));
 
 
-type AppView = 'login' | 'website' | 'learn-more' | 'insights' | 'telemedicine' | 'records' | 'doctor-dashboard' | 'pharmacy';
+type AppView = 'login' | 'website' | 'learn-more' | 'insights' | 'health-resources' | 'telemedicine' | 'records' | 'doctor-dashboard' | 'pharmacy';
 
 // Loading component
 function LoadingSection() {
@@ -281,6 +281,14 @@ export default function App() {
     );
   }
 
+  if (currentView === 'health-resources') {
+    return (
+      <Suspense fallback={<LoadingSection />}>
+        <HealthResources onBack={handleBackToWebsite} />
+      </Suspense>
+    );
+  }
+
 
   // Show main website after login
   return (
@@ -341,7 +349,6 @@ export default function App() {
         }}
       />
       <ProblemSection />
-      <ImpactSection />
       
       {/* Add Features Section */}
       <FeaturesSection onFeatureClick={handleFeatureClick} userRole={userRole} />

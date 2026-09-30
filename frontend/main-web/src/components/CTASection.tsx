@@ -1,4 +1,4 @@
-import { Sparkles } from 'lucide-react';
+import { Globe, Sparkles, Users } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 export default function CTASection() {

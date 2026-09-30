@@ -44,7 +44,7 @@ export default function TelemedicineApp({ onBack }: TelemedicineAppProps) {
   const languages = [
     { code: 'english', name: 'English', native: 'English', flag: '🇺🇸' },
     { code: 'hindi', name: 'Hindi', native: 'हिंदी', flag: '🇮🇳' },
-    { code: 'punjabi', name: 'Punjabi', native: 'ਪੰਜਾਬੀ', flag: '🇮🇳' }
+    { code: 'marathi', name: 'Marathi', native: 'मराठी', flag: '🇮🇳' }
   ];
 
   return (
@@ -94,7 +94,7 @@ export default function TelemedicineApp({ onBack }: TelemedicineAppProps) {
           </h2>
           <p className="text-gray-600 max-w-3xl mx-auto">
             Breaking language barriers in healthcare with our multilingual telemedicine platform. 
-            Consultations available in Punjabi, Hindi, and English.
+            Consultations available in Marathi, Hindi, and English.
           </p>
         </div>
 
@@ -105,7 +105,7 @@ export default function TelemedicineApp({ onBack }: TelemedicineAppProps) {
               <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Globe className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-gray-900 mb-2">ਪੰਜਾਬੀ (Punjabi)</h3>
+              <h3 className="text-gray-900 mb-2">मराठी (Marathi)</h3>
               <small className="text-gray-600">Native language support for comfortable consultations</small>
             </CardContent>
           </Card>

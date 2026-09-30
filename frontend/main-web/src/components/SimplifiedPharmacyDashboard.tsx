@@ -324,7 +324,7 @@ const SimplifiedPharmacyDashboard: React.FC<SimplifiedPharmacyDashboardProps> = 
                 </div>
                 <div>
                   <h1 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>Pharmacy Dashboard</h1>
-                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Inventory Management</p>
+                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Prescription Fulfillment</p>
                 </div>
               </div>
             </div>

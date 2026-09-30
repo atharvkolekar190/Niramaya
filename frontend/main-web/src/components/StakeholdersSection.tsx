@@ -17,7 +17,7 @@ function StakeholdersSection({ compact = false }: Props) {
     },
     {
       icon: UserCheck,
-      title: "Nabha Civil Hospital Staff",
+      title: "Hospital and Clinic Teams",
       description: "Healthcare professionals extending their reach through digital consultations",
       benefits: ["Increased patient reach", "Better resource utilization", "Digital health records", "Reduced workload"],
       color: "blue",
@@ -26,7 +26,7 @@ function StakeholdersSection({ compact = false }: Props) {
     },
     {
       icon: Building,
-      title: "Punjab Health Department",
+      title: "Healthcare Partners",
       description: "Government stakeholders implementing scalable rural healthcare solutions",
       benefits: ["Policy implementation", "Resource optimization", "Data-driven insights", "Scalable model"],
       color: "purple",
@@ -37,7 +37,7 @@ function StakeholdersSection({ compact = false }: Props) {
       icon: Pill,
       title: "Local Pharmacies",
       description: "Pharmacy networks integrated for medicine availability and delivery",
-      benefits: ["Inventory management", "Prescription integration", "Delivery coordination", "Revenue increase"],
+      benefits: ["Prescription integration", "Fulfillment coordination", "Patient order updates", "Clearer workflows"],
       color: "orange",
       gradient: "from-orange-500 to-amber-600",
       count: "12 Pharmacies"
@@ -150,7 +150,7 @@ function StakeholdersSection({ compact = false }: Props) {
             <h4 className="text-lg mb-4 text-center text-gray-900">Impact Multiplier Effect</h4>
             <p className="text-center text-gray-700 leading-relaxed">
               When all stakeholders work together, the impact is multiplied. Better healthcare access leads to 
-              improved productivity, stronger communities, and sustainable economic growth across rural Punjab.
+              improved productivity, stronger communities, and sustainable access to care across rural and semi-urban India.
             </p>
           </div>
         </div>

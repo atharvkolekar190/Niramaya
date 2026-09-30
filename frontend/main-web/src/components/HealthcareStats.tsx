@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { MapPin, Clock, Users, Pill, Phone, Wifi, WifiOff } from 'lucide-react';
 
 interface HealthcareStatsProps {
-  language: 'en' | 'hi' | 'pa';
+  language: 'en' | 'hi' | 'mr';
   isOnline: boolean;
   nearbyCount: number;
   availableDoctors: number;
@@ -40,19 +40,19 @@ const translations = {
     emergency: "आपातकालीन कॉल",
     telemedicine: "दूरचिकित्सा"
   },
-  pa: {
-    nearbyServices: "ਨੇੜਲੀਆਂ ਸੇਵਾਵਾਂ",
-    healthcenters: "ਸਿਹਤ ਕੇਂਦਰ",
-    availableDoctors: "ਉਪਲਬਧ ਡਾਕਟਰ",
-    emergencyServices: "ਐਮਰਜੈਂਸੀ ਸੇਵਾਵਾਂ",
-    status: "ਸਥਿਤੀ", 
-    online: "ਔਨਲਾਇਨ",
-    offline: "ਔਫਲਾਇਨ - ਸੀਮਤ ਸੁਵਿਧਾਵਾਂ",
-    lastUpdated: "ਆਖਰੀ ਅਪਡੇਟ: 2 ਮਿੰਟ ਪਹਿਲਾਂ",
-    quickActions: "ਤੁਰੰਤ ਕਾਰਵਾਈਆਂ",
-    findNearby: "ਨੇੜਲੇ ਲੱਭੋ",
-    emergency: "ਐਮਰਜੈਂਸੀ ਕਾਲ",
-    telemedicine: "ਦੂਰ-ਚਿਕਿਤਸਾ"
+  mr: {
+    nearbyServices: "जवळच्या सेवा",
+    healthcenters: "आरोग्य केंद्रे",
+    availableDoctors: "उपलब्ध डॉक्टर",
+    emergencyServices: "आपत्कालीन सेवा",
+    status: "स्थिती",
+    online: "ऑनलाइन",
+    offline: "ऑफलाइन - मर्यादित सुविधा",
+    lastUpdated: "शेवटचे अपडेट: २ मिनिटांपूर्वी",
+    quickActions: "जलद कृती",
+    findNearby: "जवळचे शोधा",
+    emergency: "आपत्कालीन कॉल",
+    telemedicine: "टेलिमेडिसिन"
   }
 };
 

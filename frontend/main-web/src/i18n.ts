@@ -4,7 +4,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import translationEN from "./locales/en/translation.json";
 import translationHI from "./locales/hi/translation.json";
-import translationPA from "./locales/pa/translation.json";
+import translationMR from "./locales/mr/translation.json";
 
 i18n
   .use(LanguageDetector)
@@ -13,7 +13,7 @@ i18n
     resources: {
       en: { translation: translationEN },
       hi: { translation: translationHI },
-      pa: { translation: translationPA },
+      mr: { translation: translationMR },
     },
     lng: "en",            // default language
     fallbackLng: "en",    // fallback if translation not found

@@ -1,4 +1,4 @@
-// Medicine Service - API integration for Nabha Medicine Availability Tracker
+// Medicine Service - API integration for Niramaya prescription fulfillment
 
 const API_BASE_URL = 'http://localhost:5001';
 

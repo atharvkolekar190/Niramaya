@@ -11,7 +11,7 @@ interface LanguageToggleProps {
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-  { code: 'pa', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳' }
+  { code: 'mr', name: 'मराठी', flag: '🇮🇳' }
 ];
 
 export default function LanguageToggle({ currentLanguage, onLanguageChange, className = '' }: LanguageToggleProps) {

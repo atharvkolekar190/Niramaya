@@ -84,7 +84,7 @@ function DataSection() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Wifi className="h-5 w-5 text-blue-600" />
-                Internet Connectivity in Rural Punjab
+                Internet connectivity for rural and semi-urban communities
               </CardTitle>
             </CardHeader>
             <CardContent>
