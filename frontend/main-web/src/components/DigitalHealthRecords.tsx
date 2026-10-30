@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, FileText, Shield, Cloud, Search, Download, Upload, Plus, Trash2, Wifi, WifiOff, RefreshCw, AlertCircle, CheckCircle, User, Stethoscope } from 'lucide-react';
+import { ArrowLeft, FileText, Shield, Cloud, Search, Download, Upload, Plus, Trash2, Wifi, WifiOff, RefreshCw, AlertCircle, CheckCircle, User, Stethoscope, Copy, Users, Share2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { healthRecordsApi, type HealthRecord } from '../services/healthRecordsApi';
+import { healthRecordsApi, type HealthRecord, type EHRFolder, type EHRShare, type User as ApiUser } from '../services/healthRecordsApi';
 import { offlineStorage, type OfflineHealthRecord } from '../services/offlineStorage';
 import { authService, type User as AuthUser } from '../services/authService';
 
@@ -35,6 +35,18 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
   const [currentPatientId, setCurrentPatientId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDoctorView, setIsDoctorView] = useState(false);
+  const [folders, setFolders] = useState<EHRFolder[]>([]);
+  const [showFamilyDialog, setShowFamilyDialog] = useState(false);
+  const [familyName, setFamilyName] = useState('');
+  const [shareFolder, setShareFolder] = useState<EHRFolder | null>(null);
+  const [doctors, setDoctors] = useState<ApiUser[]>([]);
+  const [selectedDoctorId, setSelectedDoctorId] = useState('');
+  const [shareResult, setShareResult] = useState<{ access_key: string; expires_at: string } | null>(null);
+  const [folderShares, setFolderShares] = useState<Record<string, EHRShare[]>>({});
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [deleteFolder, setDeleteFolder] = useState<EHRFolder | null>(null);
+  const [confirmFolderArchive, setConfirmFolderArchive] = useState(false);
+  const [deletingFolder, setDeletingFolder] = useState(false);
 
   // Check online status and API availability
   useEffect(() => {
@@ -65,13 +77,14 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
 
   // Load records after user data is loaded
   useEffect(() => {
-    if (user && isLoggedIn) {
+    if (user && isLoggedIn && isApiAvailable && user.role === 'patient') {
       console.log('User logged in, loading records for:', user.id);
       loadRecords();
+      loadFolders();
       // Always update unsynced count when user logs in
       updateUnsyncedCount();
     }
-  }, [user, isLoggedIn]);
+  }, [user, isLoggedIn, isApiAvailable]);
 
   // Retry loading records if they're still empty after a delay
   useEffect(() => {
@@ -377,6 +390,140 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
     }
   };
 
+  const loadFolders = async () => {
+    if (!user || user.role !== 'patient') return;
+    setError(null);
+    try {
+      const response = await healthRecordsApi.getEHRFolders();
+      if (!response.success || !response.data?.folders) {
+        throw new Error(response.message || 'Unable to load EHR folders');
+      }
+      let loaded = response.data.folders;
+      if (loaded.length === 0) {
+        const created = await healthRecordsApi.createEHRFolder({
+          name: user.name, member_type: 'account_holder',
+          profile: { email: user.email, phone: user.phone, age: user.age, gender: user.gender }
+        });
+        if (!created.success || !created.data?.folder) {
+          throw new Error(created.message || 'Unable to create the account-holder EHR folder');
+        }
+        // Reload so Firestore remains the source of truth and any server metadata is retained.
+        const persisted = await healthRecordsApi.getEHRFolders();
+        if (!persisted.success || !persisted.data?.folders) {
+          throw new Error(persisted.message || 'Unable to reload EHR folders after creation');
+        }
+        loaded = persisted.data.folders;
+      }
+      setFolders(loaded);
+      if (!selectedFolderId && loaded[0]) {
+        setSelectedFolderId(loaded[0].folder_id);
+        await viewFolderRecords(loaded[0]);
+      }
+      const shares = await Promise.all(loaded.map(async folder => {
+        const result = await healthRecordsApi.getEHRShares(folder.folder_id);
+        return [folder.folder_id, result.success ? result.data.shares : []] as const;
+      }));
+      setFolderShares(Object.fromEntries(shares));
+    } catch (folderError) {
+      console.error('Failed to load EHR folders:', folderError);
+      setFolders([]);
+      setError(folderError instanceof Error ? folderError.message : 'Unable to load EHR folders');
+    }
+  };
+
+  const viewFolderRecords = async (folder: EHRFolder) => {
+    setSelectedFolderId(folder.folder_id);
+    const response = await healthRecordsApi.getEHRFolderRecords(folder.folder_id);
+    if (!response.success) {
+      setError(response.message || 'Unable to load this EHR folder');
+      return;
+    }
+    setRecords(response.data.records.map((record: any) => ({
+      ...record,
+      uploaded_by: record.uploaded_by || record.patient_id,
+      file_url: record.fileUrl,
+      file_name: record.fileName || record.title || 'Health record',
+      file_type: record.fileType,
+      file_size: record.fileSize || 0,
+      notes: record.notes || '',
+      encrypted: record.encrypted || false,
+      date: record.created_at
+    })));
+    setCurrentPatientId(folder.owner_patient_id);
+  };
+
+  const addFamilyFolder = async () => {
+    if (!familyName.trim()) return;
+    const response = await healthRecordsApi.createEHRFolder({ name: familyName.trim(), member_type: 'other' });
+    if (!response.success) {
+      setError(response.message || 'Unable to add family member');
+      return;
+    }
+    setFamilyName('');
+    setShowFamilyDialog(false);
+    await loadFolders();
+    setSuccess('Family member folder added');
+  };
+
+  const archiveFamilyFolder = async () => {
+    if (!deleteFolder || deleteFolder.member_type === 'account_holder' || !confirmFolderArchive) return;
+    setDeletingFolder(true);
+    setError(null);
+    try {
+      const response = await healthRecordsApi.deleteEHRFolder(deleteFolder.folder_id, true);
+      if (!response.success) {
+        setError(response.message || 'Unable to archive this EHR folder');
+        return;
+      }
+      setDeleteFolder(null);
+      setConfirmFolderArchive(false);
+      if (selectedFolderId === deleteFolder.folder_id) {
+        setSelectedFolderId(null);
+        setRecords([]);
+      }
+      await loadFolders();
+      setSuccess(response.message || 'Family member folder archived');
+    } catch (archiveError) {
+      setError(archiveError instanceof Error ? archiveError.message : 'Unable to archive this EHR folder');
+    } finally {
+      setDeletingFolder(false);
+    }
+  };
+
+  const openShareDialog = async (folder: EHRFolder) => {
+    setShareFolder(folder);
+    setShareResult(null);
+    const response = await healthRecordsApi.getDoctors();
+    if (response.success) setDoctors(response.data.doctors);
+  };
+
+  const createShare = async () => {
+    if (!shareFolder || !selectedDoctorId) return;
+    const response = await healthRecordsApi.shareEHRFolder(shareFolder.folder_id, selectedDoctorId);
+    if (!response.success) {
+      setError(response.message || 'Unable to share folder');
+      return;
+    }
+    setShareResult({ access_key: response.data.access_key, expires_at: response.data.expires_at });
+    setFolderShares(current => ({
+      ...current,
+      [shareFolder.folder_id]: [...(current[shareFolder.folder_id] || []), response.data.share]
+    }));
+  };
+
+  const revokeShare = async (folder: EHRFolder, share: EHRShare) => {
+    const response = await healthRecordsApi.revokeEHRShare(folder.folder_id, share.share_id);
+    if (response.success) {
+      setFolderShares(current => ({
+        ...current,
+        [folder.folder_id]: (current[folder.folder_id] || []).map(item =>
+          item.share_id === share.share_id ? { ...item, status: 'revoked' } : item)
+      }));
+    } else {
+      setError(response.message || 'Unable to revoke access');
+    }
+  };
+
   // Handle patient search
   const handlePatientSearch = async () => {
     if (!patientIdInput.trim()) {
@@ -408,7 +555,8 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
   };
 
   const handleFileUpload = async () => {
-    if (!selectedFile || !user) {
+    if (!selectedFile || !user || !selectedFolderId) {
+      setError('Select the EHR folder that should receive this document.');
       return;
     }
 
@@ -428,7 +576,9 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
         const response = await healthRecordsApi.uploadRecord(
           selectedFile,
           userId,
-          uploadNotes
+          uploadNotes,
+          false,
+          selectedFolderId
         );
         
         if (response.success) {
@@ -438,8 +588,7 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
           setUploadNotes('');
           loadRecords();
         } else {
-          
-          setError('Failed to upload record');
+          setError('The server did not accept this upload.');
         }
       } else {
         // Save offline
@@ -453,6 +602,7 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
         
         await offlineStorage.saveHealthRecord({
           patient_id: userId,
+          folder_id: selectedFolderId,
           file_name: selectedFile.name,
           file_type: selectedFile.type,
           file_size: selectedFile.size,
@@ -470,7 +620,7 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
         loadRecords();
       }
     } catch (error) {
-      setError('Failed to upload record');
+      setError(error instanceof Error ? error.message : 'Failed to upload record');
     } finally {
       setLoading(false);
     }
@@ -719,6 +869,131 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
           </CardContent>
         </Card>
 
+        {user?.role === 'patient' && isApiAvailable && (
+          <Card className="mb-8 border-indigo-200 bg-white">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5 text-indigo-600" />Family EHR folders</CardTitle>
+                <p className="text-sm text-gray-600 mt-1">Each folder is isolated and can be shared for 24 hours.</p>
+              </div>
+              <Button variant="outline" onClick={() => setShowFamilyDialog(true)}><Plus className="h-4 w-4 mr-2" />Add family member</Button>
+            </CardHeader>
+            <CardContent className="grid gap-4 md:grid-cols-2">
+              {folders.map(folder => (
+                <div key={folder.folder_id} className={`rounded-xl border p-4 ${selectedFolderId === folder.folder_id ? 'border-indigo-500' : 'border-indigo-100'}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{folder.name}</h3>
+                      <p className="text-xs text-gray-500 capitalize">{folder.member_type.replace('_', ' ')}</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="font-mono text-sm tracking-widest text-indigo-700">{folder.sharing_code}</span>
+                        <Button size="sm" variant="ghost" onClick={() => navigator.clipboard.writeText(folder.sharing_code)} aria-label={`Copy ${folder.name}'s EHR sharing code`}><Copy className="h-3.5 w-3.5" /></Button>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <Button size="sm" variant="ghost" onClick={() => viewFolderRecords(folder)}>View records</Button>
+                      <Button size="sm" variant="outline" onClick={() => openShareDialog(folder)}><Share2 className="h-4 w-4 mr-1" />Share with Doctor</Button>
+                    </div>
+                  </div>
+                  {folder.member_type !== 'account_holder' && (
+                    <div className="mt-3 flex justify-end border-t border-gray-100 pt-3">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800"
+                        title={`Delete ${folder.name}'s EHR folder`}
+                        aria-label={`Delete ${folder.name}'s EHR folder`}
+                        onClick={() => {
+                          setDeleteFolder(folder);
+                          setConfirmFolderArchive(false);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete folder
+                      </Button>
+                    </div>
+                  )}
+                  <div className="mt-3 space-y-2">
+                    {(folderShares[folder.folder_id] || []).map(share => (
+                      <div key={share.share_id} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-xs">
+                        <Badge variant="outline" className={share.status === 'active' ? 'text-green-700' : 'text-gray-600'}>{share.status}</Badge>
+                        <span>Expires {new Date(share.expires_at).toLocaleString()}</span>
+                        {share.status === 'active' && <Button size="sm" variant="ghost" onClick={() => revokeShare(folder, share)}>Revoke</Button>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        <Dialog open={showFamilyDialog} onOpenChange={setShowFamilyDialog}>
+          <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
+            <DialogHeader><DialogTitle>Add family member folder</DialogTitle><DialogDescription>Profile and records will remain separate from other folders.</DialogDescription></DialogHeader>
+            <Input className="bg-white text-gray-900 placeholder:text-gray-400" value={familyName} onChange={event => setFamilyName(event.target.value)} placeholder="Family member name" />
+            <Button onClick={addFamilyFolder}>Create folder</Button>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={!!deleteFolder}
+          onOpenChange={open => {
+            if (!open && !deletingFolder) {
+              setDeleteFolder(null);
+              setConfirmFolderArchive(false);
+            }
+          }}
+        >
+          <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Archive {deleteFolder?.name}'s EHR folder?</DialogTitle>
+              <DialogDescription>
+                This action cannot delete the account-holder folder. The selected family folder will be hidden from this account,
+                its documents will be retained safely, and all active doctor access will be revoked. Old sharing keys and links will stop working.
+              </DialogDescription>
+            </DialogHeader>
+            <label className="flex items-start gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={confirmFolderArchive}
+                onChange={event => setConfirmFolderArchive(event.target.checked)}
+                disabled={deletingFolder}
+              />
+              <span>I understand that this folder and its documents will be archived and no longer available through the EHR.</span>
+            </label>
+            <div className="mt-2 flex shrink-0 justify-end gap-2 border-t border-gray-200 pt-4">
+              <Button variant="outline" onClick={() => setDeleteFolder(null)} disabled={deletingFolder}>Cancel</Button>
+              <Button variant="outline-red-200" onClick={archiveFamilyFolder} disabled={!confirmFolderArchive || deletingFolder}>
+                {deletingFolder ? 'Archiving...' : 'Confirm archive'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={!!shareFolder} onOpenChange={open => !open && setShareFolder(null)}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Share {shareFolder?.name}'s EHR</DialogTitle><DialogDescription>Select one doctor. This folder's 10-character code is used only through an active 24-hour doctor grant.</DialogDescription></DialogHeader>
+            {shareFolder && <div className="flex items-center gap-2 rounded-lg bg-indigo-50 p-3"><span className="text-sm text-indigo-900">Folder code:</span><span className="font-mono font-semibold tracking-widest text-indigo-700">{shareFolder.sharing_code}</span><Button size="sm" variant="ghost" onClick={() => navigator.clipboard.writeText(shareFolder.sharing_code)}><Copy className="h-4 w-4" /></Button></div>}
+            {!shareResult ? (
+              <>
+                <select className="w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900" value={selectedDoctorId} onChange={event => setSelectedDoctorId(event.target.value)}>
+                  <option value="">Select a doctor</option>
+                  {doctors.map(doctor => <option key={doctor.id} value={doctor.id}>Dr. {doctor.name} {doctor.specialization ? `- ${doctor.specialization}` : ''}</option>)}
+                </select>
+                <Button onClick={createShare} disabled={!selectedDoctorId}>Generate secure access key</Button>
+              </>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-gray-600">Share this key only with the selected doctor. It cannot be used for another doctor or folder.</p>
+                <div className="flex gap-2"><Input className="bg-white text-gray-900 font-mono" readOnly value={shareResult.access_key} /><Button size="icon" variant="outline" onClick={() => navigator.clipboard.writeText(shareResult.access_key)}><Copy className="h-4 w-4" /></Button></div>
+                <p className="text-sm font-medium text-amber-700">Expires: {new Date(shareResult.expires_at).toLocaleString()}</p>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
         {/* Error and Success Messages */}
         {error && (
           <Card className="mb-6 border-red-200 bg-red-50">
@@ -821,6 +1096,27 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Destination EHR folder
+                  </label>
+                  <select
+                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                    value={selectedFolderId || ''}
+                    onChange={(event) => setSelectedFolderId(event.target.value)}
+                    required
+                  >
+                    <option value="" disabled>Select the person whose EHR this belongs to</option>
+                    {folders.map(folder => (
+                      <option key={folder.folder_id} value={folder.folder_id}>{folder.name}</option>
+                    ))}
+                  </select>
+                  {selectedFolderId && (
+                    <p className="mt-2 text-xs text-blue-700">
+                      Destination: {folders.find(folder => folder.folder_id === selectedFolderId)?.name || 'Selected EHR folder'}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Notes (Optional)
                   </label>
                   <Textarea
@@ -839,7 +1135,7 @@ export default function DigitalHealthRecords({ onBack }: DigitalHealthRecordsPro
                   </Button>
                   <Button
                     onClick={handleFileUpload}
-                    disabled={!selectedFile || loading}
+                    disabled={!selectedFile || !selectedFolderId || loading}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
                     {loading ? (

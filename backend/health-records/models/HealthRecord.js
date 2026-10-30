@@ -36,6 +36,7 @@ class HealthRecord {
   constructor(data) {
     this.record_id = data.record_id;
     this.patient_id = data.patient_id;
+    this.folder_id = data.folder_id;
     this.doctor_id = data.doctor_id;
     this.title = data.title;
     this.description = data.description;
@@ -67,6 +68,7 @@ class HealthRecord {
       const recordDoc = {
         record_id: recordData.record_id || uuidv4(),
         patient_id: recordData.patient_id,
+        folder_id: recordData.folder_id,
         doctor_id: recordData.doctor_id,
         title: recordData.title,
         description: recordData.description,
@@ -116,6 +118,7 @@ class HealthRecord {
       const recordDoc = {
         record_id: recordData.record_id || uuidv4(),
         patient_id: recordData.patient_id,
+        folder_id: recordData.folder_id,
         doctor_id: recordData.doctor_id,
         title: recordData.title,
         description: recordData.description,
@@ -191,6 +194,18 @@ class HealthRecord {
     } catch (error) {
       throw new Error(`Error finding health records by patient: ${error.message}`);
     }
+  }
+
+  static async findByFolderId(folderId) {
+    if (!this.isDbAvailable()) {
+      throw new Error('Firebase database not available');
+    }
+    const snapshot = await db.collection('health_records')
+      .where('folder_id', '==', folderId).get();
+    const records = [];
+    snapshot.forEach(doc => records.push(new HealthRecord({ id: doc.id, ...doc.data() })));
+    records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    return records;
   }
 
   // Get health records by doctor ID
@@ -309,6 +324,7 @@ class HealthRecord {
     return {
       record_id: this.record_id,
       patient_id: this.patient_id,
+      folder_id: this.folder_id,
       doctor_id: this.doctor_id,
       title: this.title,
       description: this.description,

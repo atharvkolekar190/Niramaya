@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Stethoscope, Users, FileText, Search, Eye, Calendar, Phone, MapPin, User, Shield, Clock, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Stethoscope, Users, FileText, Search, Eye, Calendar, Phone, MapPin, User, Shield, Clock, AlertCircle, CheckCircle, RefreshCw, Download } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { healthRecordsApi, type User as ApiUser } from '../services/healthRecordsApi';
+import { healthRecordsApi, type User as ApiUser, type EHRNotification } from '../services/healthRecordsApi';
 import { offlineStorage } from '../services/offlineStorage';
 import { authService } from '../services/authService';
 
@@ -43,6 +43,11 @@ export default function DoctorDashboard({ onBack, onNavigateToRecords }: DoctorD
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [creatingSample, setCreatingSample] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [ehrAccessKey, setEhrAccessKey] = useState('');
+  const [sharedEhr, setSharedEhr] = useState<{ folder: { name: string }; records: any[]; expires_at: string } | null>(null);
+  const [ehrAccessError, setEhrAccessError] = useState<string | null>(null);
+  const [ehrNotifications, setEhrNotifications] = useState<EHRNotification[]>([]);
+  const [notificationError, setNotificationError] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -65,12 +70,61 @@ export default function DoctorDashboard({ onBack, onNavigateToRecords }: DoctorD
     checkApiHealth();
     loadUserData();
     loadPatients();
+    loadEhrNotifications();
 
     return () => {
       window.removeEventListener('online', handleOnlineStatusChange);
       window.removeEventListener('offline', handleOnlineStatusChange);
     };
   }, []);
+
+  const loadEhrNotifications = async () => {
+    try {
+      const response = await healthRecordsApi.getEHRNotifications();
+      if (response.success) setEhrNotifications(response.data.notifications);
+    } catch (loadError) {
+      setNotificationError(loadError instanceof Error ? loadError.message : 'Unable to load shared EHR notifications');
+    }
+  };
+
+  const openEhrNotification = async (notification: EHRNotification) => {
+    setEhrAccessError(null);
+    try {
+      const response = await healthRecordsApi.openEHRNotification(notification.notification_id);
+      if (!response.success) {
+        setEhrAccessError(response.message || 'This shared EHR is no longer available');
+        return;
+      }
+      setSharedEhr(response.data);
+      await loadEhrNotifications();
+    } catch (openError) {
+      setEhrAccessError(openError instanceof Error ? openError.message : 'Unable to open shared EHR');
+    }
+  };
+
+  const openSharedRecord = async (record: any) => {
+    try {
+      const blob = await healthRecordsApi.downloadRecord(record.record_id);
+      const url = URL.createObjectURL(blob);
+      const isPdf = (record.fileType || '').toLowerCase() === 'application/pdf' ||
+        (record.fileName || '').toLowerCase().endsWith('.pdf');
+      if (isPdf) {
+        const opened = window.open(url, '_blank', 'noopener,noreferrer');
+        if (!opened) throw new Error('The browser blocked the document window. Allow pop-ups and try again.');
+        window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      } else {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = record.fileName || record.title || 'health-record';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+      }
+    } catch (openError) {
+      setEhrAccessError(openError instanceof Error ? openError.message : 'Unable to open this document');
+    }
+  };
 
   // Filter patients based on search term
   useEffect(() => {
@@ -107,6 +161,18 @@ export default function DoctorDashboard({ onBack, onNavigateToRecords }: DoctorD
     } finally {
       setRefreshing(false);
     }
+  };
+
+  const redeemEhrAccess = async () => {
+    setEhrAccessError(null);
+    setSharedEhr(null);
+    if (!ehrAccessKey.trim()) return;
+    const response = await healthRecordsApi.redeemEHRShare(ehrAccessKey.trim());
+    if (!response.success) {
+      setEhrAccessError(response.message || 'Access key is invalid or expired');
+      return;
+    }
+    setSharedEhr(response.data);
   };
 
   const loadUserData = async () => {
@@ -199,7 +265,7 @@ export default function DoctorDashboard({ onBack, onNavigateToRecords }: DoctorD
     try {
       setCreatingSample(true);
       setError(null);
-      const baseUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3002';
+      const baseUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3000';
       const unique = Math.random().toString(36).slice(2, 8);
       const response = await fetch(`${baseUrl}/api/auth/patient/register`, {
         method: 'POST',
@@ -467,6 +533,72 @@ export default function DoctorDashboard({ onBack, onNavigateToRecords }: DoctorD
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-12">
+        <Card className="mb-8 border-indigo-200 bg-indigo-50/50">
+          <CardHeader><CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-indigo-600" />Authorized family EHR access</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-gray-600">Enter an access key shared specifically with you. Access is limited to one family folder and expires automatically.</p>
+            <div className="flex gap-2">
+              <Input value={ehrAccessKey} onChange={event => setEhrAccessKey(event.target.value)} placeholder="Paste 24-hour access key" />
+              <Button onClick={redeemEhrAccess}>Redeem key</Button>
+            </div>
+            {ehrAccessError && <p className="text-sm text-red-700">{ehrAccessError}</p>}
+            {sharedEhr && <div className="rounded-lg bg-white p-4">
+              <div className="flex items-center justify-between"><p className="font-semibold">{sharedEhr.folder.name}</p><Badge>Expires {new Date(sharedEhr.expires_at).toLocaleString()}</Badge></div>
+              <p className="mt-2 text-sm text-gray-600">{sharedEhr.records.length} authorized record(s) available.</p>
+              <div className="mt-3 space-y-2">
+                {sharedEhr.records.map(record => (
+                  <button
+                    type="button"
+                    key={record.record_id}
+                    className="flex w-full items-center justify-between rounded border p-2 text-left text-sm hover:bg-indigo-50"
+                    onClick={() => openSharedRecord(record)}
+                  >
+                    <span>
+                      <span className="font-medium">{record.title || record.fileName || 'Health record'}</span>
+                      <span className="ml-2 text-gray-500">- {new Date(record.created_at).toLocaleDateString()}</span>
+                    </span>
+                    <Download className="h-4 w-4 text-indigo-600" />
+                  </button>
+                ))}
+              </div>
+            </div>}
+          </CardContent>
+        </Card>
+        <Card className="mb-8 border-amber-200 bg-amber-50/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-amber-600" />
+              Shared EHR notifications
+              {ehrNotifications.filter(notification => !notification.read_at && notification.access_status === 'active').length > 0 && (
+                <Badge className="bg-amber-600 text-white">
+                  {ehrNotifications.filter(notification => !notification.read_at && notification.access_status === 'active').length} pending
+                </Badge>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {notificationError && <p className="text-sm text-red-700">{notificationError}</p>}
+            {ehrNotifications.length === 0 && !notificationError && (
+              <p className="text-sm text-gray-600">No shared EHR notifications.</p>
+            )}
+            {ehrNotifications.map(notification => (
+              <div key={notification.notification_id} className="flex items-center justify-between rounded-lg border bg-white p-3">
+                <div>
+                  <p className="font-medium">{notification.patient_name} - {notification.folder_name}</p>
+                  <p className="text-xs text-gray-600">
+                    Shared {new Date(notification.shared_at).toLocaleString()} · Expires {new Date(notification.expires_at).toLocaleString()}
+                  </p>
+                  <Badge className={notification.access_status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}>
+                    {notification.access_status}
+                  </Badge>
+                </div>
+                {notification.access_status === 'active' && (
+                  <Button size="sm" onClick={() => openEhrNotification(notification)}>Open EHR</Button>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
         {/* Doctor Info */}
         <Card className="mb-8 border-blue-200 bg-blue-50/50">
           <CardContent className="p-6">

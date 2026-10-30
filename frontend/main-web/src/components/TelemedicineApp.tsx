@@ -1,7 +1,10 @@
-import { useState } from 'react';
-import { ArrowLeft, Video, Globe, MessageSquare, Phone, Calendar, Heart, X, Minimize2 } from 'lucide-react';
+import { useEffect, useState, type FormEvent } from 'react';
+import { Video, Globe, MessageSquare, Phone, Calendar, Heart, X, Minimize2 } from 'lucide-react';
 import { Button } from './ui/button';
+import NiramayaNavbar from './NiramayaNavbar';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { authService } from '../services/authService';
+import { appointmentsApi, type Appointment, type AppointmentDoctor } from '../services/appointmentsApi';
 //
 
 interface TelemedicineAppProps {
@@ -14,6 +17,83 @@ export default function TelemedicineApp({ onBack }: TelemedicineAppProps) {
   const [showVideoCall, setShowVideoCall] = useState(false);
   const [videoCallUrl, setVideoCallUrl] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
+  const currentUser = authService.getCurrentUser();
+  const [doctors, setDoctors] = useState<AppointmentDoctor[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [appointmentDate, setAppointmentDate] = useState('');
+  const [appointmentTime, setAppointmentTime] = useState('');
+  const [selectedDoctor, setSelectedDoctor] = useState('');
+  const [reason, setReason] = useState('');
+  const [appointmentMessage, setAppointmentMessage] = useState('');
+  const [appointmentError, setAppointmentError] = useState('');
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState(true);
+
+  const loadAppointments = async () => {
+    setIsLoadingAppointments(true);
+    try {
+      const appointmentList = await appointmentsApi.list();
+      setAppointments(appointmentList);
+    } catch (error) {
+      setAppointmentError(error instanceof Error ? error.message : 'Unable to load appointments');
+    } finally {
+      setIsLoadingAppointments(false);
+    }
+  };
+
+  useEffect(() => {
+    const loadAppointmentData = async () => {
+      try {
+        if (currentUser?.role === 'patient') {
+          const [doctorList] = await Promise.all([appointmentsApi.listDoctors(), loadAppointments()]);
+          setDoctors(doctorList);
+          if (doctorList.length > 0) setSelectedDoctor(doctorList[0].doctor_id);
+        } else if (currentUser?.role === 'doctor') {
+          await loadAppointments();
+        } else {
+          setIsLoadingAppointments(false);
+        }
+      } catch (error) {
+        setAppointmentError(error instanceof Error ? error.message : 'Unable to load appointment data');
+        setIsLoadingAppointments(false);
+      }
+    };
+
+    loadAppointmentData();
+  }, [currentUser?.role]);
+
+  const handleBookAppointment = async (event: FormEvent) => {
+    event.preventDefault();
+    setAppointmentMessage('');
+    setAppointmentError('');
+    try {
+      await appointmentsApi.create({
+        doctor_id: selectedDoctor,
+        appointment_date: appointmentDate,
+        appointment_time: appointmentTime,
+        reason
+      });
+      setAppointmentMessage('Appointment booked successfully.');
+      setAppointmentDate('');
+      setAppointmentTime('');
+      setReason('');
+      await loadAppointments();
+    } catch (error) {
+      setAppointmentError(error instanceof Error ? error.message : 'Unable to book appointment');
+    }
+  };
+
+  const handleAppointmentStatus = async (appointment: Appointment, status: Appointment['status']) => {
+    setAppointmentMessage('');
+    setAppointmentError('');
+    try {
+      await appointmentsApi.updateStatus(appointment.appointment_id, status);
+      setSelectedAppointment(null);
+      await loadAppointments();
+    } catch (error) {
+      setAppointmentError(error instanceof Error ? error.message : 'Unable to update appointment');
+    }
+  };
 
   const handleStartConsultation = () => {
     // Embed TeleHealth app directly in the main website
@@ -49,43 +129,25 @@ export default function TelemedicineApp({ onBack }: TelemedicineAppProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-green-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              onClick={onBack}
-              className="flex items-center gap-2 hover:bg-green-50"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Homepage
-            </Button>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                <Video className="h-4 w-4 text-white" />
-              </div>
-              <h1 className="text-gray-900">Multilingual Telemedicine Consultation</h1>
-            </div>
-            
-            {/* Language Selector */}
-            <div className="flex items-center gap-2">
+      <NiramayaNavbar
+        activePage="appointments"
+        onBack={onBack}
+        actions={
+          <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowLanguageModal(true)}
-                className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex min-h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-emerald-300 hover:bg-emerald-50"
               >
                 <Globe className="h-4 w-4 text-gray-600" />
                 <span className="text-sm font-medium">
                   {languages.find(lang => lang.code === selectedLanguage)?.native}
                 </span>
               </button>
-            </div>
-            <div className="w-32"></div>
           </div>
-        </div>
-      </div>
+        }
+      />
 
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h2 className="text-gray-900 mb-4">
@@ -217,6 +279,187 @@ export default function TelemedicineApp({ onBack }: TelemedicineAppProps) {
             </CardContent>
           </Card>
         </div>
+
+        {/* Appointment Management */}
+        {(currentUser?.role === 'patient' || currentUser?.role === 'doctor') && (
+          <section className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-orange-600" />
+              </div>
+              <div>
+                <h2 className="text-gray-900">Appointment Management</h2>
+                <p className="text-gray-600 text-sm">
+                  {currentUser.role === 'patient'
+                    ? 'Book and keep track of your healthcare appointments.'
+                    : 'Review patient appointments and update their status.'}
+                </p>
+              </div>
+            </div>
+
+            {appointmentMessage && (
+              <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-800">
+                {appointmentMessage}
+              </div>
+            )}
+            {appointmentError && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+                {appointmentError}
+              </div>
+            )}
+
+            {currentUser.role === 'patient' && (
+              <Card className="mb-6 border-orange-200">
+                <CardHeader>
+                  <CardTitle className="text-gray-900">Book an appointment</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleBookAppointment} className="grid gap-4 md:grid-cols-2">
+                    <label className="text-sm text-gray-700">
+                      Doctor
+                      <select
+                        value={selectedDoctor}
+                        onChange={(event) => setSelectedDoctor(event.target.value)}
+                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
+                        required
+                      >
+                        {doctors.map((doctor) => (
+                          <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                            Dr. {doctor.name} - {doctor.specialization || 'General Medicine'}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="text-sm text-gray-700">
+                      Date
+                      <input
+                        type="date"
+                        value={appointmentDate}
+                        min={new Date().toISOString().slice(0, 10)}
+                        onChange={(event) => setAppointmentDate(event.target.value)}
+                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
+                        required
+                      />
+                    </label>
+                    <label className="text-sm text-gray-700">
+                      Time
+                      <input
+                        type="time"
+                        value={appointmentTime}
+                        onChange={(event) => setAppointmentTime(event.target.value)}
+                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
+                        required
+                      />
+                    </label>
+                    <label className="text-sm text-gray-700 md:col-span-2">
+                      Reason for visit (optional)
+                      <textarea
+                        value={reason}
+                        onChange={(event) => setReason(event.target.value)}
+                        maxLength={500}
+                        rows={2}
+                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
+                      />
+                    </label>
+                    <div className="md:col-span-2">
+                      <Button type="submit" className="bg-orange-600 hover:bg-orange-700" disabled={doctors.length === 0}>
+                        Book appointment
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
+            <Card className="border-green-200">
+              <CardHeader>
+                <CardTitle className="text-gray-900">
+                  {currentUser.role === 'patient' ? 'My appointments' : 'Patient appointments'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoadingAppointments ? (
+                  <p className="text-gray-600">Loading appointments...</p>
+                ) : appointments.length === 0 ? (
+                  <p className="text-gray-600">No appointments found.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {appointments.map((appointment) => (
+                      <button
+                        key={appointment.appointment_id}
+                        type="button"
+                        onClick={() => setSelectedAppointment(appointment)}
+                        className="w-full rounded-lg border border-gray-200 p-4 text-left hover:border-green-400 hover:bg-green-50"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {currentUser.role === 'patient'
+                                ? `Dr. ${appointment.doctor?.name || 'Assigned doctor'}`
+                                : appointment.patient?.name || 'Patient'}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {appointment.appointment_date} at {appointment.appointment_time}
+                            </p>
+                          </div>
+                          <span className={`rounded-full px-3 py-1 text-xs font-medium ${
+                            appointment.status === 'scheduled'
+                              ? 'bg-blue-100 text-blue-800'
+                              : appointment.status === 'completed'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {appointment.status}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {selectedAppointment && (
+              <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Appointment details</h3>
+                    <p className="mt-1 text-sm text-gray-700">
+                      {selectedAppointment.appointment_date} at {selectedAppointment.appointment_time}
+                    </p>
+                    <p className="text-sm text-gray-700">Status: {selectedAppointment.status}</p>
+                    {selectedAppointment.reason && (
+                      <p className="mt-2 text-sm text-gray-700">Reason: {selectedAppointment.reason}</p>
+                    )}
+                    {selectedAppointment.notes && (
+                      <p className="mt-1 text-sm text-gray-700">Notes: {selectedAppointment.notes}</p>
+                    )}
+                  </div>
+                  <button type="button" onClick={() => setSelectedAppointment(null)} aria-label="Close appointment details">
+                    <X className="h-5 w-5 text-gray-600" />
+                  </button>
+                </div>
+                {currentUser.role === 'doctor' && selectedAppointment.status === 'scheduled' && (
+                  <div className="mt-4 flex gap-2">
+                    <Button type="button" className="bg-green-600 hover:bg-green-700" onClick={() => handleAppointmentStatus(selectedAppointment, 'completed')}>
+                      Mark completed
+                    </Button>
+                    <Button type="button" variant="outline" className="border-red-300 text-red-700 hover:bg-red-50" onClick={() => handleAppointmentStatus(selectedAppointment, 'cancelled')}>
+                      Cancel appointment
+                    </Button>
+                  </div>
+                )}
+                {currentUser.role === 'patient' && selectedAppointment.status === 'scheduled' && (
+                  <div className="mt-4">
+                    <Button type="button" variant="outline" className="border-red-300 text-red-700 hover:bg-red-50" onClick={() => handleAppointmentStatus(selectedAppointment, 'cancelled')}>
+                      Cancel appointment
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        )}
 
 
         {/* Stats Section */}

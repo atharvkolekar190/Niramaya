@@ -1,6 +1,22 @@
 const { HealthRecord } = require('../models/HealthRecord');
+const EHRFolder = require('../models/EHRFolder');
+const EHRShare = require('../models/EHRShare');
 const { getFileInfo, deleteFile } = require('../middleware/upload');
+const { recordAuditEvent } = require('../models/EHRAudit');
 const path = require('path');
+
+const getRecordFolderId = async (record) => {
+  if (record.folder_id) return record.folder_id;
+  const folders = await EHRFolder.findByOwner(record.patient_id);
+  return folders.find(folder => folder.member_type === 'account_holder')?.folder_id || null;
+};
+
+const doctorHasFolderAccess = async (record, doctorId) => {
+  const folderId = await getRecordFolderId(record);
+  if (!folderId) return false;
+  const shares = await EHRShare.findActiveForOwner(folderId, record.patient_id);
+  return shares.some(share => share.doctor_id === doctorId && share.status === 'active');
+};
 
 // Upload health record with file
 const uploadRecord = async (req, res) => {
@@ -38,9 +54,24 @@ const uploadRecord = async (req, res) => {
       });
     }
 
+    let folder_id = req.body.folder_id || null;
+    if (userType === 'patient' && !folder_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'An EHR folder is required for patient uploads'
+      });
+    }
+    if (folder_id) {
+      const folder = await EHRFolder.findById(folder_id);
+      if (userType !== 'patient' || !folder || folder.owner_patient_id !== patient_id) {
+        return res.status(403).json({ success: false, message: 'Permission denied for this EHR folder' });
+      }
+    }
+
     // Create health record with file
     const recordData = {
       patient_id,
+      folder_id,
       doctor_id,
       title: req.body.title || req.file.originalname,
       description: req.body.description || '',
@@ -53,6 +84,12 @@ const uploadRecord = async (req, res) => {
     };
 
     const record = await HealthRecord.createWithFile(recordData, req.file);
+    await recordAuditEvent({
+      event_type: 'record_uploaded',
+      actor_id: req.user.patient_id || req.user.doctor_id,
+      actor_role: req.userType,
+      folder_id: record.folder_id
+    });
 
     res.status(201).json({
       success: true,
@@ -100,9 +137,18 @@ const createRecord = async (req, res) => {
       });
     }
 
+    let folder_id = req.body.folder_id || null;
+    if (folder_id) {
+      const folder = await EHRFolder.findById(folder_id);
+      if (userType !== 'patient' || !folder || folder.owner_patient_id !== patient_id) {
+        return res.status(403).json({ success: false, message: 'Permission denied for this EHR folder' });
+      }
+    }
+
     // Create health record
     const recordData = {
       patient_id,
+      folder_id,
       doctor_id,
       title: title || 'Health Record',
       description: description || '',
@@ -135,13 +181,23 @@ const createRecord = async (req, res) => {
 const getPatientRecords = async (req, res) => {
   try {
     const { patient_id } = req.params;
-    const { limit = 50, offset = 0 } = req.query;
+    const requestedLimit = Number.parseInt(req.query.limit, 10);
+    const requestedOffset = Number.parseInt(req.query.offset, 10);
+    const limit = Number.isInteger(requestedLimit) && requestedLimit > 0
+      ? Math.min(requestedLimit, 100)
+      : 50;
+    const offset = Number.isInteger(requestedOffset) && requestedOffset >= 0
+      ? requestedOffset
+      : 0;
 
-    // Get records for the patient
-    const records = await HealthRecord.findByPatientId(patient_id, parseInt(limit));
+    if (req.userType === 'patient' && patient_id !== req.user.patient_id) {
+      return res.status(403).json({ success: false, message: 'Permission denied to view these records' });
+    }
+    let records = await HealthRecord.findByPatientId(patient_id);
+    if (req.userType === 'doctor') records = records.filter(record => !record.folder_id);
 
     // Apply pagination
-    const paginatedRecords = records.slice(parseInt(offset), parseInt(offset) + parseInt(limit));
+    const paginatedRecords = records.slice(offset, offset + limit);
 
     res.status(200).json({
       success: true,
@@ -149,12 +205,16 @@ const getPatientRecords = async (req, res) => {
       data: {
         records: paginatedRecords.map(record => record.toJSON()),
         total: records.length,
-        limit: parseInt(limit),
-        offset: parseInt(offset)
+        limit,
+        offset
       }
     });
   } catch (error) {
-    console.error('Get patient records error:', error);
+    console.error('Get patient records error:', {
+      message: error.message,
+      patientId: req.params.patient_id,
+      userType: req.userType
+    });
     res.status(500).json({
       success: false,
       message: 'Error retrieving patient records',
@@ -174,6 +234,9 @@ const getRecord = async (req, res) => {
         success: false,
         message: 'Health record not found'
       });
+    }
+    if (req.userType === 'doctor' && !(await doctorHasFolderAccess(record, req.user.doctor_id))) {
+      return res.status(403).json({ success: false, message: 'This EHR folder has not been shared with you' });
     }
 
     res.status(200).json({
@@ -206,6 +269,9 @@ const downloadRecord = async (req, res) => {
         success: false,
         message: 'Health record not found'
       });
+    }
+    if (req.userType === 'doctor' && !(await doctorHasFolderAccess(record, req.user.doctor_id))) {
+      return res.status(403).json({ success: false, message: 'This EHR folder has not been shared with you' });
     }
 
     console.log('Found record:', {
@@ -247,18 +313,18 @@ const downloadRecord = async (req, res) => {
     const fs = require('fs');
     // Resolve to absolute path inside project uploads directory
     const uploadsDir = path.resolve(__dirname, '..', 'uploads');
-    const safeFileName = (record.fileName || '').toString();
+    const safeFileName = path.basename((record.fileName || '').toString());
     const derivedName = safeFileName || (record.fileUrl ? path.basename(record.fileUrl) : '');
     const filePath = path.join(uploadsDir, derivedName);
-    if (filePath && fs.existsSync(filePath)) {
-      console.log('Downloading from local file system:', filePath);
+    const resolvedFilePath = path.resolve(filePath);
+    if (resolvedFilePath.startsWith(`${uploadsDir}${path.sep}`) && fs.existsSync(resolvedFilePath)) {
       
       // Set appropriate headers for file download
       res.setHeader('Content-Disposition', `attachment; filename="${derivedName}"`);
       res.setHeader('Content-Type', record.fileType || 'application/octet-stream');
 
       // Stream the file
-      const fileStream = fs.createReadStream(filePath);
+      const fileStream = fs.createReadStream(resolvedFilePath);
       fileStream.pipe(res);
       return;
     }
@@ -291,6 +357,9 @@ const updateRecord = async (req, res) => {
         success: false,
         message: 'Health record not found'
       });
+    }
+    if (req.userType === 'doctor' && !(await doctorHasFolderAccess(record, req.user.doctor_id))) {
+      return res.status(403).json({ success: false, message: 'This EHR folder has not been shared with you' });
     }
 
     // Check if user has permission to update this record
@@ -335,6 +404,9 @@ const deleteRecord = async (req, res) => {
         success: false,
         message: 'Health record not found'
       });
+    }
+    if (req.userType === 'doctor' && !(await doctorHasFolderAccess(record, req.user.doctor_id))) {
+      return res.status(403).json({ success: false, message: 'This EHR folder has not been shared with you' });
     }
 
     // Check if user has permission to delete this record

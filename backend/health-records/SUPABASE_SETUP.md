@@ -35,7 +35,7 @@ Create a `.env` file in the project root:
 ```env
 # JWT Configuration
 JWT_SECRET=your-jwt-secret-key-here
-PORT=3002
+PORT=3000
 
 # Supabase Configuration
 SUPABASE_URL=https://your-project-id.supabase.co
@@ -49,7 +49,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key-here
 npm install
 
 # Start the server
-JWT_SECRET=dev-secret-key PORT=3002 npm start
+JWT_SECRET=dev-secret-key PORT=3000 npm start
 ```
 
 ## 🎯 Features Enabled

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from 'react';
-import { User, LogOut, ChevronDown } from 'lucide-react';
+import { User, LogOut, ChevronDown, HeartPulse, CalendarDays, FileText, BookOpen, Menu, X } from 'lucide-react';
 import HeroSection from './components/HeroSection';
 import ProblemSection from './components/ProblemSection';
 import FeaturesSection from './components/FeaturesSection';
@@ -44,6 +44,7 @@ export default function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   // Initialize authentication on app load
   useEffect(() => {
@@ -197,6 +198,11 @@ export default function App() {
     }, 100);
   };
 
+  const handleQuickNavigation = (view: AppView) => {
+    setIsMobileNavOpen(false);
+    setCurrentView(view);
+  };
+
   // Navigation helper functions that update both state and URL
   const navigateToView = (view: AppView, path: string) => {
     setCurrentView(view);
@@ -292,9 +298,73 @@ export default function App() {
 
   // Show main website after login
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header with Profile Dropdown */}
-      <div className="fixed top-4 right-4 z-50 flex gap-2">
+    <div className="niramaya-page">
+      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <button type="button" onClick={handleBackToWebsite} className="flex items-center gap-3 text-left">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-900/15">
+              <HeartPulse className="h-5 w-5" />
+            </span>
+            <span className="hidden sm:block">
+              <span className="block text-sm font-bold tracking-tight text-slate-900">Niramaya</span>
+              <span className="block text-xs text-slate-500">Digital Healthcare</span>
+            </span>
+          </button>
+          <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
+            <button type="button" onClick={() => handleQuickNavigation('telemedicine')} className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">
+              <CalendarDays className="mr-2 inline h-4 w-4" />Appointments
+            </button>
+            <button type="button" onClick={() => handleQuickNavigation('records')} className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">
+              <FileText className="mr-2 inline h-4 w-4" />Health records
+            </button>
+            <button type="button" onClick={() => handleQuickNavigation('health-resources')} className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-emerald-50 hover:text-emerald-700">
+              <BookOpen className="mr-2 inline h-4 w-4" />Wellness Library
+            </button>
+          </nav>
+          <div className="flex items-center gap-2">
+            <div className="relative profile-dropdown">
+              {user ? (
+                <button
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:border-emerald-300 hover:bg-emerald-50"
+                  aria-expanded={isProfileDropdownOpen}
+                >
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"><User className="h-4 w-4" /></span>
+                  <span className="hidden md:block">{user.name}</span>
+                  <ChevronDown className="h-4 w-4 text-slate-400" />
+                </button>
+              ) : (
+                <button onClick={() => setCurrentView('login')} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">Login</button>
+              )}
+              {isProfileDropdownOpen && user && (
+                <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+                  <div className="border-b border-slate-100 px-3 py-2">
+                    <p className="font-semibold text-slate-900">{user.name}</p>
+                    <p className="text-xs capitalize text-slate-500">{user.role} account</p>
+                  </div>
+                  <button onClick={handleLogout} className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-600 hover:bg-red-50 hover:text-red-700">
+                    <LogOut className="h-4 w-4" />Log out
+                  </button>
+                </div>
+              )}
+            </div>
+            <button type="button" className="rounded-xl border border-slate-200 p-2 lg:hidden" onClick={() => setIsMobileNavOpen(!isMobileNavOpen)} aria-label="Toggle navigation">
+              {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+        {isMobileNavOpen && (
+          <nav className="border-t border-slate-100 bg-white px-4 py-3 lg:hidden" aria-label="Mobile navigation">
+            <div className="mx-auto grid max-w-7xl gap-1 sm:grid-cols-3">
+              <button onClick={() => handleQuickNavigation('telemedicine')} className="rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-700 hover:bg-emerald-50">Appointments & consultations</button>
+              <button onClick={() => handleQuickNavigation('records')} className="rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-700 hover:bg-emerald-50">Digital health records</button>
+              <button onClick={() => handleQuickNavigation('health-resources')} className="rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-700 hover:bg-emerald-50">Wellness Library</button>
+            </div>
+          </nav>
+        )}
+      </header>
+      {/* Legacy profile container retained for layout compatibility */}
+      <div className="hidden">
         {user ? (
           <div className="relative profile-dropdown">
             {/* Profile Dropdown Button */}

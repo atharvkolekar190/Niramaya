@@ -13,6 +13,7 @@ console.log('PORT:', process.env.PORT);
 const authRoutes = require('./routes/auth');
 const recordsRoutes = require('./routes/records');
 const patientsRoutes = require('./routes/patients');
+const appointmentsRoutes = require('./routes/appointments');
 
 // Initialize Express app
 const app = express();
@@ -64,6 +65,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/records', recordsRoutes);
 app.use('/api/patients', patientsRoutes);
+app.use('/api/appointments', appointmentsRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -74,6 +76,7 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: '/api/auth',
       records: '/api/records',
+      appointments: '/api/appointments',
       health: '/health'
     },
     documentation: 'https://your-api-docs.com'
@@ -91,7 +94,12 @@ app.use('*', (req, res) => {
 
 // Global error handler
 app.use((error, req, res, next) => {
-  console.error('Global error handler:', error);
+  console.error('Global error handler:', {
+    name: error.name,
+    message: error.message,
+    method: req.method,
+    path: req.path
+  });
   
   // Handle specific error types
   if (error.name === 'ValidationError') {
@@ -99,6 +107,13 @@ app.use((error, req, res, next) => {
       success: false,
       message: 'Validation error',
       errors: error.details || error.message
+    });
+  }
+
+  if (error instanceof SyntaxError && error.status === 400 && error.type === 'entity.parse.failed') {
+    return res.status(400).json({
+      success: false,
+      message: 'Request body must be valid JSON'
     });
   }
   
@@ -118,12 +133,9 @@ app.use((error, req, res, next) => {
   }
   
   // Default error response
-  res.status(500).json({
+  res.status(error.statusCode || 500).json({
     success: false,
-    message: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
-      : error.message,
-    ...(process.env.NODE_ENV !== 'production' && { stack: error.stack })
+    message: error.message || 'Internal server error'
   });
 });
 

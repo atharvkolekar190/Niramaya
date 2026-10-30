@@ -92,6 +92,7 @@ const validateLogin = (req, res, next) => {
 const validateHealthRecordUpload = (req, res, next) => {
   const schema = Joi.object({
     patient_id: Joi.string().optional(), // Allow patient_id for doctors
+    folder_id: Joi.string().optional(),
     notes: Joi.string().max(1000).optional(),
     encrypted: Joi.boolean().optional()
   });

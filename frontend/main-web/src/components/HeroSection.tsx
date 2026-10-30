@@ -7,7 +7,7 @@ type Props = { onLearnMore?: () => void; onViewSolution?: () => void };
 
 export default function HeroSection({ onLearnMore, onViewSolution }: Props) {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-[calc(100vh-1rem)] items-center justify-center overflow-hidden bg-slate-950">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <ImageWithFallback
@@ -15,21 +15,25 @@ export default function HeroSection({ onLearnMore, onViewSolution }: Props) {
           alt="Rural healthcare in India"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(5,31,27,0.88),rgba(7,42,39,0.6),rgba(15,23,42,0.58))]"></div>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 text-center text-white">
-        <h1 className="text-5xl md:text-7xl mb-6 leading-tight">
+      <div className="relative z-10 mx-auto max-w-6xl px-6 py-20 text-center text-white">
+        <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-emerald-100 backdrop-blur-sm">
+          <span className="h-2 w-2 rounded-full bg-emerald-300"></span>
+          Connected care for every community
+        </div>
+        <h1 className="mb-6 text-5xl font-semibold leading-[1.08] md:text-7xl">
           Niramaya Digital Healthcare
         </h1>
         
-        <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
+        <p className="mx-auto mb-8 max-w-3xl text-lg leading-relaxed text-slate-100 md:text-2xl">
           A unified platform for patients, doctors, pharmacists, records, consultations, and health insights.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg" onClick={onLearnMore}
+          <Button size="lg" className="rounded-xl bg-emerald-500 px-8 py-3 text-white shadow-lg shadow-emerald-950/25 hover:bg-emerald-400" onClick={onLearnMore}
           >
             Learn More
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -38,7 +42,7 @@ export default function HeroSection({ onLearnMore, onViewSolution }: Props) {
           <Button 
             size="lg" 
             variant="outline" 
-            className="border-white text-white hover:bg-white hover:text-gray-900 px-8 py-3 rounded-lg"
+            className="rounded-xl border-white/50 bg-white/5 px-8 py-3 text-white hover:bg-white hover:text-slate-900"
             onClick={onViewSolution}
           >
             <Play className="mr-2 h-5 w-5" />
@@ -47,18 +51,18 @@ export default function HeroSection({ onLearnMore, onViewSolution }: Props) {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto">
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl text-green-400 mb-2">8</div>
-            <div className="text-sm opacity-80">Villages Connected</div>
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-3 gap-3 rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-sm md:gap-8">
+          <div className="rounded-xl px-2 py-4 text-center">
+            <div className="mb-2 text-3xl font-semibold text-emerald-300 md:text-4xl">8</div>
+            <div className="text-xs text-slate-200 md:text-sm">Villages Connected</div>
           </div>
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl text-blue-400 mb-2">12</div>
-            <div className="text-sm opacity-80">Doctors Available</div>
+          <div className="rounded-xl border-x border-white/10 px-2 py-4 text-center">
+            <div className="mb-2 text-3xl font-semibold text-sky-300 md:text-4xl">12</div>
+            <div className="text-xs text-slate-200 md:text-sm">Doctors Available</div>
           </div>
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl text-orange-400 mb-2">15km</div>
-            <div className="text-sm opacity-80">Average Distance</div>
+          <div className="rounded-xl px-2 py-4 text-center">
+            <div className="mb-2 text-3xl font-semibold text-amber-300 md:text-4xl">15km</div>
+            <div className="text-xs text-slate-200 md:text-sm">Average Distance</div>
           </div>
         </div>
       </div>

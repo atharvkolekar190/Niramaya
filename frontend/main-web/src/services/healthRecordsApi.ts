@@ -56,13 +56,46 @@ export interface RecordsResponse {
   };
 }
 
+export interface EHRFolder {
+  folder_id: string;
+  owner_patient_id: string;
+  member_type: string;
+  name: string;
+  profile: Record<string, string | number>;
+  sharing_code: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EHRShare {
+  share_id: string;
+  folder_id: string;
+  doctor_id: string;
+  status: 'active' | 'expired' | 'revoked';
+  expires_at: string;
+  created_at: string;
+  revoked_at?: string | null;
+}
+
+export interface EHRNotification {
+  notification_id: string;
+  share_id: string;
+  folder_id: string;
+  patient_name: string;
+  folder_name: string;
+  shared_at: string;
+  expires_at: string;
+  access_status: 'active' | 'expired' | 'revoked';
+  read_at?: string | null;
+}
+
 class HealthRecordsApiService {
   private baseUrl: string;
   private token: string | null = null;
 
   constructor() {
     // Use environment variable or default to localhost
-    this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+    this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     this.token = localStorage.getItem('health_records_token');
   }
 
@@ -89,6 +122,27 @@ class HealthRecordsApiService {
     }
 
     return headers;
+  }
+
+  private async parseResponse<T>(response: Response): Promise<T> {
+    const body = await response.text();
+    let data: any = {};
+
+    if (body.trim()) {
+      try {
+        data = JSON.parse(body);
+      } catch {
+        data = { success: false, message: `Server returned an invalid response (${response.status})` };
+      }
+    }
+
+    if (!response.ok) {
+      const details = Array.isArray(data.errors) ? `: ${data.errors.join(', ')}` : '';
+      const message = `${data.message || `Request failed with status ${response.status}`}${details}`;
+      throw new Error(message);
+    }
+
+    return data as T;
   }
 
   // Check if API is available
@@ -126,7 +180,7 @@ class HealthRecordsApiService {
           body: JSON.stringify({ email, password }),
         });
 
-        const data = await response.json();
+        const data = await this.parseResponse<any>(response);
         
         if (data.status === 'success' && data.token) {
           // Transform Flask API response to match our AuthResponse format
@@ -183,7 +237,7 @@ class HealthRecordsApiService {
 
       clearTimeout(timeoutId);
       console.log('healthRecordsApi: Response status:', response.status);
-      const data = await response.json();
+      const data = await this.parseResponse<AuthResponse>(response);
       console.log('healthRecordsApi: Response success:', data.success);
       console.log('healthRecordsApi: Response message:', data.message);
       if (data.data) {
@@ -221,7 +275,7 @@ class HealthRecordsApiService {
       body: JSON.stringify(userData),
     });
 
-    const data = await response.json();
+    const data = await this.parseResponse<AuthResponse>(response);
     console.log('healthRecordsApi: Patient registration response:', { status: response.status, data });
     
     if (!response.ok) {
@@ -256,7 +310,7 @@ class HealthRecordsApiService {
       body: JSON.stringify(userData),
     });
 
-    const data = await response.json();
+    const data = await this.parseResponse<AuthResponse>(response);
     console.log('healthRecordsApi: Doctor registration response:', { status: response.status, data });
     
     if (!response.ok) {
@@ -304,7 +358,7 @@ class HealthRecordsApiService {
         }),
       });
 
-      const data = await response.json();
+      const data = await this.parseResponse<any>(response);
       console.log('healthRecordsApi: Pharmacist registration response:', { status: response.status, data });
       
       if (data.status === 'success' && data.token) {
@@ -357,7 +411,7 @@ class HealthRecordsApiService {
       headers: this.getHeaders(),
     });
 
-    return response.json();
+    return this.parseResponse(response);
   }
 
   async updateProfile(updateData: Partial<User>): Promise<{ success: boolean; data: { user: User } }> {
@@ -367,7 +421,7 @@ class HealthRecordsApiService {
       body: JSON.stringify(updateData),
     });
 
-    return response.json();
+    return this.parseResponse(response);
   }
 
   // Health Records endpoints
@@ -375,13 +429,15 @@ class HealthRecordsApiService {
     file: File,
     patientId: string,
     notes: string = '',
-    encrypted: boolean = false
+    encrypted: boolean = false,
+    folderId?: string
   ): Promise<{ success: boolean; data: { record: HealthRecord } }> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('patient_id', patientId);
     formData.append('notes', notes);
     formData.append('encrypted', encrypted.toString());
+    if (folderId) formData.append('folder_id', folderId);
 
     const response = await fetch(`${this.baseUrl}/api/records/upload`, {
       method: 'POST',
@@ -391,7 +447,7 @@ class HealthRecordsApiService {
       body: formData,
     });
 
-    return response.json();
+    return this.parseResponse(response);
   }
 
   async getPatientRecords(
@@ -407,7 +463,7 @@ class HealthRecordsApiService {
       }
     );
 
-    return response.json();
+    return this.parseResponse(response);
   }
 
   async getRecord(recordId: string): Promise<{ success: boolean; data: { record: HealthRecord } }> {
@@ -416,7 +472,7 @@ class HealthRecordsApiService {
       headers: this.getHeaders(),
     });
 
-    return response.json();
+    return this.parseResponse(response);
   }
 
   async downloadRecord(recordId: string): Promise<Blob> {
@@ -426,7 +482,15 @@ class HealthRecordsApiService {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to download record');
+      const body = await response.text();
+      let message = `Failed to download record (${response.status})`;
+      try {
+        const data = JSON.parse(body);
+        message = data.message || message;
+      } catch {
+        // Preserve the status-based message for non-JSON error responses.
+      }
+      throw new Error(message);
     }
 
     return response.blob();
@@ -439,7 +503,7 @@ class HealthRecordsApiService {
       body: JSON.stringify({ notes }),
     });
 
-    return response.json();
+    return this.parseResponse(response);
   }
 
   async deleteRecord(recordId: string): Promise<{ success: boolean; message: string }> {
@@ -448,7 +512,7 @@ class HealthRecordsApiService {
       headers: this.getHeaders(),
     });
 
-    return response.json();
+    return this.parseResponse(response);
   }
 
   async getRecordsByDateRange(
@@ -464,7 +528,83 @@ class HealthRecordsApiService {
       }
     );
 
-    return response.json();
+    return this.parseResponse(response);
+  }
+
+  async getEHRFolders(): Promise<{ success: boolean; message?: string; data: { folders: EHRFolder[] } }> {
+    const response = await fetch(`${this.baseUrl}/api/records/folders`, { headers: this.getHeaders() });
+    return this.parseResponse(response);
+  }
+
+  async createEHRFolder(data: { name: string; member_type: string; profile?: Record<string, string | number | undefined> }): Promise<{ success: boolean; message?: string; data: { folder: EHRFolder } }> {
+    const response = await fetch(`${this.baseUrl}/api/records/folders`, {
+      method: 'POST', headers: this.getHeaders(), body: JSON.stringify(data)
+    });
+    return this.parseResponse(response);
+  }
+
+  async deleteEHRFolder(folderId: string, confirmDataLoss = false) {
+    const response = await fetch(`${this.baseUrl}/api/records/folders/${folderId}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ confirm_data_loss: confirmDataLoss })
+    });
+    return this.parseResponse(response);
+  }
+
+  async getEHRFolderRecords(folderId: string): Promise<RecordsResponse> {
+    const response = await fetch(`${this.baseUrl}/api/records/folders/${folderId}/records`, { headers: this.getHeaders() });
+    return this.parseResponse(response);
+  }
+
+  async getDoctors(): Promise<{ success: boolean; data: { doctors: User[] } }> {
+    const response = await fetch(`${this.baseUrl}/api/records/doctors`, { headers: this.getHeaders() });
+    return this.parseResponse(response);
+  }
+
+  async shareEHRFolder(folderId: string, doctorId: string) {
+    const response = await fetch(`${this.baseUrl}/api/records/folders/${folderId}/share`, {
+      method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ doctor_id: doctorId })
+    });
+    return this.parseResponse(response);
+  }
+
+  async getEHRShares(folderId: string): Promise<{ success: boolean; data: { shares: EHRShare[] } }> {
+    const response = await fetch(`${this.baseUrl}/api/records/folders/${folderId}/shares`, { headers: this.getHeaders() });
+    return this.parseResponse(response);
+  }
+
+  async revokeEHRShare(folderId: string, shareId: string) {
+    const response = await fetch(`${this.baseUrl}/api/records/folders/${folderId}/shares/${shareId}`, {
+      method: 'DELETE', headers: this.getHeaders()
+    });
+    return this.parseResponse(response);
+  }
+
+  async redeemEHRShare(accessKey: string) {
+    const response = await fetch(`${this.baseUrl}/api/records/shares/redeem`, {
+      method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ access_key: accessKey })
+    });
+    return this.parseResponse(response);
+  }
+
+  async getEHRNotifications(): Promise<{ success: boolean; data: { notifications: EHRNotification[] } }> {
+    const response = await fetch(`${this.baseUrl}/api/records/notifications`, { headers: this.getHeaders() });
+    return this.parseResponse(response);
+  }
+
+  async openEHRNotification(notificationId: string) {
+    const response = await fetch(`${this.baseUrl}/api/records/notifications/${notificationId}/open`, {
+      method: 'POST', headers: this.getHeaders()
+    });
+    return this.parseResponse(response);
+  }
+
+  async dismissEHRNotification(notificationId: string) {
+    const response = await fetch(`${this.baseUrl}/api/records/notifications/${notificationId}`, {
+      method: 'DELETE', headers: this.getHeaders()
+    });
+    return this.parseResponse(response);
   }
 
   // Get all patients (Doctor only)
@@ -480,7 +620,7 @@ class HealthRecordsApiService {
       }
     );
 
-    return response.json();
+    return this.parseResponse(response);
   }
 
   // Get a single patient by ID (Doctor only)
@@ -490,7 +630,7 @@ class HealthRecordsApiService {
       headers: this.getHeaders(),
     });
 
-    return response.json();
+    return this.parseResponse(response);
   }
 
   // Sync offline records when online

@@ -57,7 +57,34 @@
     port: 3000,
     open: true,
     proxy: {
-      // Proxy all API requests through unified backend
+      // Health Records API runs separately from the unified services backend.
+      '/api/records': {
+        target: 'http://127.0.0.1:3002',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path
+      },
+      // Keep authentication, patient, and appointment routes on the
+      // Health Records backend as well.
+      '/api/auth': {
+        target: 'http://127.0.0.1:3002',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path
+      },
+      '/api/patients': {
+        target: 'http://127.0.0.1:3002',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path
+      },
+      '/api/appointments': {
+        target: 'http://127.0.0.1:3002',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path
+      },
+      // Other unified-service API routes retain their existing destination.
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,

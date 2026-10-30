@@ -1,4 +1,4 @@
-import { Video, FileText, Pill, Building2, Stethoscope, BookOpen } from 'lucide-react';
+import { Video, FileText, Pill, Building2, Stethoscope, BookOpen, ArrowUpRight } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 
 interface FeaturesSectionProps {
@@ -203,14 +203,15 @@ export default function FeaturesSection({ onFeatureClick, userRole }: FeaturesSe
   console.log('FeaturesSection: Final features array:', features.map(f => f.id));
 
   return (
-    <section id="solutions" className="py-20 bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4">
+    <section id="solutions" className="bg-slate-50 py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl text-gray-900 mb-4">
+        <div className="mb-14 max-w-3xl">
+          <p className="niramaya-kicker mb-3">One connected care platform</p>
+          <h2 className="niramaya-section-title mb-4">
             Comprehensive Healthcare <span className="text-green-600">Solutions</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg leading-relaxed text-slate-600">
             {userRole ?
               `Explore ${userRole}-specific tools designed for your healthcare needs` :
               'Explore Niramaya tools for connected, accessible digital healthcare'
@@ -219,28 +220,28 @@ export default function FeaturesSection({ onFeatureClick, userRole }: FeaturesSe
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+        <div className="grid gap-5 md:grid-cols-2">
           {features.map((feature) => {
             const IconComponent = feature.icon;
             return (
               <Card
                 key={feature.id}
-                className={`cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${feature.borderColor} ${feature.hoverColor} group`}
+                className={`group cursor-pointer rounded-2xl border bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_45px_-25px_rgba(15,23,42,0.45)] ${feature.borderColor} ${feature.hoverColor}`}
                 onClick={() => onFeatureClick(feature.id)}
               >
-                <CardContent className="p-8 h-full">
+                <CardContent className="h-full p-7 md:p-8">
                   <div className="flex flex-col h-full">
                     {/* Icon */}
-                    <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.color} shadow-lg shadow-slate-900/10 transition-transform duration-300 group-hover:scale-105`}>
                       <IconComponent className="h-8 w-8 text-white" />
                     </div>
 
                     {/* Content */}
                     <div className="flex-1">
-                      <h3 className="text-xl text-gray-900 mb-3 group-hover:text-gray-800 transition-colors">
+                      <h3 className="mb-3 text-xl font-semibold text-slate-900 transition-colors group-hover:text-emerald-800">
                         {feature.title}
                       </h3>
-                      <p className="text-gray-600 leading-relaxed mb-4">
+                      <p className="mb-5 leading-relaxed text-slate-600">
                         {feature.description}
                       </p>
                       {featureBullets[feature.id] ? (
@@ -257,18 +258,11 @@ export default function FeaturesSection({ onFeatureClick, userRole }: FeaturesSe
 
                     {/* CTA */}
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">
+                      <span className="text-sm font-medium text-slate-500 group-hover:text-emerald-700 transition-colors">
                         Click to explore
                       </span>
-                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                        <svg
-                          className="w-4 h-4 text-gray-600 group-hover:translate-x-1 transition-transform"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-hover:bg-emerald-100 group-hover:text-emerald-700">
+                        <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                       </div>
                     </div>
                   </div>
